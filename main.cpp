@@ -9,13 +9,6 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
     Game game(&window);
 
-    // sf::Texture texture;
-    // if (!texture.loadFromFile("assets/home_screen_background.png"))
-    // {
-    //     std::exit(1);
-    // }
-    // sf::Sprite sprite(texture);
-
     while(!game.isDone())
     {
         game.clearScreen();

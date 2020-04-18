@@ -19,15 +19,17 @@ public:
     void handleInput();          // void public member function to handle all input from keyboard/mouse
     void update();               // void public member function to update game objects
     void render();               // void public member function to render all game objects
-    std::vector<sf::Sprite*> m_vecOfSprites; // vector of sprites indexed by order in which they should be displayed
 
 
 private:
     void titleScreenLoad();      // private member function to load the title screen assets
-    void titleScreenInput();     // private member function to do title screen input if screen is title screen
-    void titleScreenRender();    // private member function to render title screen
+    void titleScreenInput() const;     // private member function to do title screen input if screen is title screen
+    void titleScreenRender() const;    // private member function to render title screen
 
     sf::RenderWindow* m_window;   // window for screen
+    std::vector<sf::Sprite> m_vecOfSprites; // vector of sprites indexed by order in which they should be displayed
+    std::vector<sf::Texture> m_vecOfTextures; // vector of textures so they are still loaded in memory
+
     const char* m_screenName;     // name of screen
 
 

@@ -30,7 +30,6 @@ void Screen::handleInput()
 
 void Screen::update()
 {
-    // updates nothing
 }
 
 void Screen::render()
@@ -52,18 +51,21 @@ void Screen::loadSprites()
 
 void Screen::titleScreenLoad()
 {
-    sf::Texture texture;
+    m_vecOfTextures.push_back(sf::Texture()); // FIGURE OUT HOW TO KEEP TEXTURE GLOBAL
 
-    if (!texture.loadFromFile("assets/home_screen_background.png"))
+    if (!m_vecOfTextures[0].loadFromFile("assets/home_screen_background.png"))
     {
         std::exit(1);
     }
-    sf::Sprite* sprite = new sf::Sprite(texture);
 
+    sf::Sprite sprite;
+    sprite.setTexture(m_vecOfTextures[0]);
     m_vecOfSprites.push_back(sprite);
+    update();
+
 }
 
-void Screen::titleScreenInput()
+void Screen::titleScreenInput() const
 {
     sf::Event event;
     while(m_window->pollEvent(event))
@@ -76,19 +78,17 @@ void Screen::titleScreenInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                // std::cout << "Mouse is pressed" << event.mouseButton.x << " " << event.mouseButton.y << '\n';
+                std::cout << "Mouse is pressed" << event.mouseButton.x << " " << event.mouseButton.y << '\n';
             }
         }
     }
 }
 
-void Screen::titleScreenRender()
+void Screen::titleScreenRender() const
 {
     for (int i = 0; i < m_vecOfSprites.size(); ++i) // loops through all sprites and displays
     {
-        m_vecOfSprites[i]->setPosition(0.f, 0.f);
-        m_window->draw(*m_vecOfSprites[i]);
+        m_window->draw(m_vecOfSprites[i]);
     }
     m_window->display();
-    std::cout << "RENDER IS HAPPENING\n";
 }
