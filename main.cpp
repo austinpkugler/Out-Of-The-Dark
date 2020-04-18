@@ -3,8 +3,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Out of the Dark");
-    Game game(window);
+    Game game;
 
     while(!game.isDone())
     {
