@@ -1,13 +1,12 @@
 #include "game.h"
-// default constructor for Game class
+// constructor for Game class
 // no return
-// no parameters
-Game::Game()
+// a parameter
+Game::Game(sf::RenderWindow* windowPtr)
 {
     m_resolution.x = sf::VideoMode::getDesktopMode().width;
     m_resolution.y = sf::VideoMode::getDesktopMode().height;
-    m_isDone = false;
-    m_window = new sf::RenderWindow(sf::VideoMode(m_resolution.x, m_resolution.y), "Out of the Dark");
+    m_window = windowPtr;
     m_screen = Screen("home_screen", m_window);
 }
 
@@ -17,6 +16,11 @@ Game::Game()
 // no parameters
 Game::~Game()
 {
+}
+
+void Game::clearScreen()
+{
+    m_window->clear(sf::Color::Black);
 }
 
 
@@ -40,7 +44,7 @@ void Game::render()
 
 bool Game::isDone() const
 {
-    return m_isDone;
+    return !(m_window->isOpen());
 }
 
 
