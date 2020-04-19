@@ -1,10 +1,11 @@
 #pragma once
+#include <string>
 struct Settings
 {
     bool playMusic;
     bool playAudio;
     int difficulty;
-    char* username;
+    std::string username;
     int frameRate;
     bool showFps;
 };

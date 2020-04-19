@@ -7,7 +7,12 @@ int main()
 {
 
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
+    sf::Clock clock;
+    float lastTime = 0;
+    float currentTime = 0;
+    float fps = 0;
     Game game(&window);
+
 
     while(!game.isDone())
     {
@@ -15,6 +20,13 @@ int main()
         game.handleInput();
         game.update();
         game.render();
+        window.display();
+
+        // calculate and store fps
+        currentTime = clock.restart().asSeconds();
+        fps = 1 / (currentTime - lastTime);
+        lastTime = currentTime;
+        game.setFps(fps);
     }
 
     return 0;
