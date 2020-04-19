@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 #include <vector>
 #include <string>
 #include <stdlib.h>
@@ -45,6 +46,7 @@ private:
     void titleScreenLoad();         // private member function to load the title screen assets
     void titleScreenInput();        // private member function to do title screen input if screen is title screen
     sf::Texture m_titleScreenBg;
+    sf::Music mainTheme;
 
     // PLAY SCREEN RESOURCES
     std::vector<std::string> getAllSaves();

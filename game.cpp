@@ -18,10 +18,35 @@ Game::Game(sf::RenderWindow* window)
     load();
     m_backgroundSprite.setScale(m_window->getSize().x / m_backgroundSprite.getLocalBounds().width,
                                 m_window->getSize().y / m_backgroundSprite.getLocalBounds().height);
+    loadSettings();
     getAllSaves();
 
 }
 
+void Game::load()
+{
+    std::cout << "screen Name at 60" << m_screenName;
+    if (m_screenName == "title_screen")
+    {
+        std::cout << "Game: Loading title screen\n";
+        titleScreenLoad();
+    }
+    else if (m_screenName == "play_screen")
+    {
+        std::cout << "Game: Loading play screen\n";
+        playScreenLoad();
+    }
+    else if (m_screenName == "settings_screen")
+    {
+        std::cout << "Game: Loading settings screen\n";
+        settingsScreenLoad();
+    }
+    else if (m_screenName == "settings_screen")
+    {
+        std::cout << "Game: Loading settings screen\n";
+        settingsScreenLoad();
+    }
+}
 
 void Game::handleInput()
 {
@@ -58,7 +83,6 @@ void Game::update()
 void Game::render()
 {
     renderBackground();
-
     if (m_settings.showFps == true)
     {
         sf::Text text;
@@ -73,6 +97,7 @@ void Game::render()
 void Game::renderBackground()
 {
     m_window->draw(m_backgroundSprite);
+    
 }
 
 void Game::clearScreen()
@@ -114,38 +139,13 @@ void Game::updateSettings()
     std::fstream file("user_data/settings.csv", std::ios::out);
     const char comma = ',';
     std::string parameterName;
-    file << "PLAY_MUSIC" << comma << m_settings.playMusic;
-    file << "PLAY_AUDIO" << comma << m_settings.playAudio;
-    file << "DIFFICULTY" << comma << m_settings.difficulty;
-    file << "USERNAME" << comma << m_settings.username;
-    file << "FRAME_RATE" << comma << m_settings.frameRate;
-    file << "SHOW_FPS" << comma << m_settings.showFps;
+    file << "PLAY_MUSIC" << comma << m_settings.playMusic << '\n';
+    file << "PLAY_AUDIO" << comma << m_settings.playAudio << '\n';;
+    file << "DIFFICULTY" << comma << m_settings.difficulty << '\n';;
+    file << "USERNAME" << comma << m_settings.username << '\n';;
+    file << "FRAME_RATE" << comma << m_settings.frameRate << '\n';;
+    file << "SHOW_FPS" << comma << m_settings.showFps << '\n';;
     file.close();
-}
-
-void Game::load()
-{
-    std::cout << "screen Name at 60" << m_screenName;
-    if (m_screenName == "title_screen")
-    {
-        std::cout << "Game: Loading title screen\n";
-        titleScreenLoad();
-    }
-    else if (m_screenName == "play_screen")
-    {
-        std::cout << "Game: Loading play screen\n";
-        playScreenLoad();
-    }
-    else if (m_screenName == "settings_screen")
-    {
-        std::cout << "Game: Loading settings screen\n";
-        settingsScreenLoad();
-    }
-    else if (m_screenName == "settings_screen")
-    {
-        std::cout << "Game: Loading settings screen\n";
-        settingsScreenLoad();
-    }
 }
 
 /*******************************************************************************
@@ -164,9 +164,16 @@ void Game::titleScreenLoad()
     {
         std::exit(1);
     }
-
     m_backgroundSprite.setTexture(m_titleScreenBg);
     std::cout << "Game: Title screen loaded\n";
+
+    // if (!mainTheme.openFromFile("assets/main_theme.wav"))
+    // {
+    //     std::exit(1);
+    // }
+    // mainTheme.setVolume(10.f);
+    // mainTheme.setLoop(true);
+    // mainTheme.play();
 }
 
 void Game::titleScreenInput()
@@ -353,27 +360,27 @@ void Game::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
-                        std::cout << "Settings Screen: Play Music 'Yes' button pressed\n";
+                        m_settings.playMusic = true;
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        std::cout << "Settings Screen: Play Audio 'Yes' button pressed\n";
+                        m_settings.playAudio = true;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        std::cout << "Settings Screen: Difficulty 'Easy' button pressed\n";
+                        m_settings.difficulty = 0; // 0 difficulty includes radar, 1 does not
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
-                        std::cout << "Settings Screen: Frame Rate '30' button pressed\n";
+                        m_settings.frameRate = 30;
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
-                        std::cout << "Settings Screen: Show FPS 'Yes' button pressed\n";
+                        m_settings.showFps = true;
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.4 &&
@@ -382,27 +389,27 @@ void Game::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
-                        std::cout << "Settings Screen: Play Music 'No' button pressed\n";
+                        m_settings.playMusic = false;
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        std::cout << "Settings Screen: Play Audio 'No' button pressed\n";
+                        m_settings.playAudio = false;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        std::cout << "Settings Screen: Difficulty 'Hard' button pressed\n";
+                        m_settings.difficulty = 1; // 0 is easy, 1 is hard
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
-                        std::cout << "Settings Screen: Frame Rate '60' button pressed\n";
+                        m_settings.frameRate = 60;
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
-                        std::cout << "Settings Screen: Show FPS 'No' button pressed\n";
+                        m_settings.showFps = false;
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.50 &&
@@ -411,7 +418,7 @@ void Game::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
-                        std::cout << "Settings Screen: Frame Rate '120' button pressed\n";
+                        m_settings.frameRate = 120;
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.10 &&
@@ -420,7 +427,7 @@ void Game::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
-                        std::cout << "Settings Screen: 'Back' button pressed\n";
+                        updateSettings();
                         m_screenName = "title_screen";
                         load();
                     }
