@@ -14,6 +14,7 @@ int main()
     Game game(&window);
 
 
+
     while(!game.isDone())
     {
         game.clearScreen();

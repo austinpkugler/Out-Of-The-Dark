@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cstdio>
 #include <iostream> // used for debugging
+#include <windows.h>
 
 #include "settings.h"
 
@@ -45,8 +46,8 @@ private:
     void titleScreenInput();        // private member function to do title screen input if screen is title screen
     sf::Texture m_titleScreenBg;
 
-
     // PLAY SCREEN RESOURCES
+    std::vector<std::string> getAllSaves();
     void playScreenUpdate();
     void playScreenLoad();
     void playScreenInput();

@@ -16,7 +16,9 @@ Game::Game(sf::RenderWindow* window)
     m_screenName = "title_screen";
     m_window = window;
     load();
-    m_backgroundSprite.setScale(m_window->getSize().x / m_backgroundSprite.getLocalBounds().width, m_window->getSize().y / m_backgroundSprite.getLocalBounds().height);
+    m_backgroundSprite.setScale(m_window->getSize().x / m_backgroundSprite.getLocalBounds().width,
+                                m_window->getSize().y / m_backgroundSprite.getLocalBounds().height);
+    getAllSaves();
 
 }
 
@@ -33,7 +35,7 @@ void Game::handleInput()
     }
     else if (m_screenName == "settings_screen")
     {
-        playScreenInput();
+        settingsScreenInput();
     }
 }
 
@@ -55,14 +57,6 @@ void Game::update()
 
 void Game::render()
 {
-    // if (m_screenName == "title_screen")
-    // {
-    //     titleScreenRender();
-    // }
-    // else if (m_screenName == "play_screen")
-    // {
-    //     playScreenRender();
-    // }
     renderBackground();
 
     if (m_settings.showFps == true)
@@ -103,7 +97,7 @@ bool Game::isDone() const
 
 void Game::loadSettings()
 {
-    std::fstream file("settings/settings.csv", std::ios::in);
+    std::fstream file("user_data/settings.csv", std::ios::in);
     char comma;
     std::string parameterName;
     file >> parameterName >> m_settings.playMusic;
@@ -117,7 +111,7 @@ void Game::loadSettings()
 
 void Game::updateSettings()
 {
-    std::fstream file("settings/settings.csv", std::ios::out);
+    std::fstream file("user_data/settings.csv", std::ios::out);
     const char comma = ',';
     std::string parameterName;
     file << "PLAY_MUSIC" << comma << m_settings.playMusic;
@@ -141,6 +135,11 @@ void Game::load()
     {
         std::cout << "Game: Loading play screen\n";
         playScreenLoad();
+    }
+    else if (m_screenName == "settings_screen")
+    {
+        std::cout << "Game: Loading settings screen\n";
+        settingsScreenLoad();
     }
     else if (m_screenName == "settings_screen")
     {
@@ -187,11 +186,10 @@ void Game::titleScreenInput()
                 float width = m_window->getSize().x;
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= width * 0.10 &&
-                    event.mouseButton.x <= width * 0.25 &&
-                    event.mouseButton.y >= height * 0.25 &&
-                    event.mouseButton.y <= height * 0.50)
+                    event.mouseButton.x <= width * 0.25)
                 {
-                    if (event.mouseButton.y <= height * 0.3)
+                    if (event.mouseButton.y >= height * 0.25 &&
+                        event.mouseButton.y <= height * 0.3)
                     {
                         std::cout << "Game: 'Play Game' button pressed\n";
                         m_screenName = "play_screen";
@@ -221,20 +219,32 @@ void Game::titleScreenInput()
  * 
  * 
  ******************************************************************************/
-void Game::playScreenUpdate()
-{
-    m_backgroundSprite.setTexture(m_playScreenBg);
-}
 
-void Game::playScreenLoad()
+std::vector<std::string> Game::getAllSaves()
 {
-    if (!m_playScreenBg.loadFromFile("assets/play_screen_background.png"))
+    std::vector<std::string> saveFiles;
+    std::fstream file("user_data/one.save", std::ios::in);
+    if (!file.fail())
     {
-        std::exit(1);
+        saveFiles.push_back("one.save");
     }
+    file.close();
 
-    m_backgroundSprite.setTexture(m_playScreenBg);
-    std::cout << "Game: Play screen loaded\n";
+    file.open("user_data/two.save", std::ios::in);
+    if (!file.fail())
+    {
+        saveFiles.push_back("two.save");
+    }
+    file.close();
+
+    file.open("user_data/three.save", std::ios::in);
+    if (!file.fail())
+    {
+        saveFiles.push_back("three.save");
+    }
+    file.close();
+
+    return saveFiles;
 }
 
 void Game::playScreenInput()
@@ -252,24 +262,31 @@ void Game::playScreenInput()
             {
                 float width = m_window->getSize().x;
                 float height = m_window->getSize().y;
-                if (event.mouseButton.x >= width * 0.10 &&
-                    event.mouseButton.x <= width * 0.25 &&
-                    event.mouseButton.y >= height * 0.25 &&
-                    event.mouseButton.y <= height * 0.50)
+                if (event.mouseButton.y >= height * 0.23 &&
+                    event.mouseButton.y <= height * 0.69)
                 {
-                    if (event.mouseButton.y <= height * 0.3)
+                    if (event.mouseButton.x >= width * 0.09 &&
+                        event.mouseButton.x <= width * 0.31)
                     {
-                        std::cout << "Game: 'Load Game' button pressed\n";
+                        std::cout << "Save Slot 1 has been pressed\n";
                     }
-                    else if (event.mouseButton.y >= height * 0.35 &&
-                             event.mouseButton.y <= height * 0.4)
+                    else if (event.mouseButton.x >= width * 0.39 &&
+                             event.mouseButton.x <= width * 0.61)
                     {
-                        std::cout << "Game: 'New Game' button pressed\n";
+                        std::cout << "Save slot 2 has been pressed\n";
                     }
-                    else if (event.mouseButton.y >= height * 0.45 &&
-                             event.mouseButton.y <= height * 0.5)
+                    else if (event.mouseButton.x >= width * 0.69 &&
+                             event.mouseButton.x <= width * 0.91)
                     {
-                        std::cout << "Game: 'Back' button pressed\n";
+                        std::cout << "Save slot 3 has been pressed\n";
+                    }
+                }
+                if (event.mouseButton.y >= height * 0.75 &&
+                    event.mouseButton.y <= height * 0.8)
+                {
+                    if (event.mouseButton.x >= width * 0.1 &&
+                    event.mouseButton.x <= width * 0.165)
+                    {
                         m_screenName = "title_screen";
                         load();
                     }
@@ -278,6 +295,21 @@ void Game::playScreenInput()
         }
     }
 }
+
+void Game::playScreenLoad()
+{
+    if (!m_titleScreenBg.loadFromFile("assets/play_screen_background.png"))
+    {
+        std::exit(1);
+    }
+    m_backgroundSprite.setTexture(m_titleScreenBg);
+}
+
+void Game::playScreenUpdate()
+{
+    m_backgroundSprite.setTexture(m_titleScreenBg);
+}
+
 
 /*******************************************************************************
  * Functions for settingsScreen change this comment to be better
@@ -308,6 +340,92 @@ void Game::settingsScreenInput()
         if (event.type == sf::Event::Closed)    // Close window button clicked.
         {
             m_window->close();
+        }
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                float width = m_window->getSize().x;
+                float height = m_window->getSize().y;
+                if (event.mouseButton.x >= width * 0.30 &&
+                    event.mouseButton.x <= width * 0.37)
+                {
+                    if (event.mouseButton.y >= height * 0.25 &&
+                        event.mouseButton.y <= height * 0.30)
+                    {
+                        std::cout << "Settings Screen: Play Music 'Yes' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.35 &&
+                             event.mouseButton.y <= height * 0.40)
+                    {
+                        std::cout << "Settings Screen: Play Audio 'Yes' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.45 &&
+                             event.mouseButton.y <= height * 0.50)
+                    {
+                        std::cout << "Settings Screen: Difficulty 'Easy' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.55 &&
+                             event.mouseButton.y <= height * 0.60)
+                    {
+                        std::cout << "Settings Screen: Frame Rate '30' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.65 &&
+                             event.mouseButton.y <= height * 0.70)
+                    {
+                        std::cout << "Settings Screen: Show FPS 'Yes' button pressed\n";
+                    }
+                }
+                else if (event.mouseButton.x >= width * 0.4 &&
+                         event.mouseButton.x <= width * 0.48)
+                {
+                    if (event.mouseButton.y >= height * 0.25 &&
+                        event.mouseButton.y <= height * 0.30)
+                    {
+                        std::cout << "Settings Screen: Play Music 'No' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.35 &&
+                             event.mouseButton.y <= height * 0.40)
+                    {
+                        std::cout << "Settings Screen: Play Audio 'No' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.45 &&
+                             event.mouseButton.y <= height * 0.50)
+                    {
+                        std::cout << "Settings Screen: Difficulty 'Hard' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.55 &&
+                             event.mouseButton.y <= height * 0.60)
+                    {
+                        std::cout << "Settings Screen: Frame Rate '60' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= height * 0.65 &&
+                             event.mouseButton.y <= height * 0.70)
+                    {
+                        std::cout << "Settings Screen: Show FPS 'No' button pressed\n";
+                    }
+                }
+                else if (event.mouseButton.x >= width * 0.50 &&
+                         event.mouseButton.x <= width * 0.56)
+                {
+                    if (event.mouseButton.y >= height * 0.55 &&
+                        event.mouseButton.y <= height * 0.6)
+                    {
+                        std::cout << "Settings Screen: Frame Rate '120' button pressed\n";
+                    }
+                }
+                else if (event.mouseButton.x >= width * 0.10 &&
+                         event.mouseButton.x <= width * 0.16)
+                {
+                    if (event.mouseButton.y >= height * 0.75 &&
+                        event.mouseButton.y <= height * 0.80)
+                    {
+                        std::cout << "Settings Screen: 'Back' button pressed\n";
+                        m_screenName = "title_screen";
+                        load();
+                    }
+                }
+            }
         }
     }
 }
