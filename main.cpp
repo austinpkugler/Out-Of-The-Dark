@@ -1,7 +1,6 @@
-// Command: g++ -std=c++11 main.cpp game.cpp snake.cpp world.cpp  -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system
+// Command: g++ -std=c++11 main.cpp game.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+#include "SFML/Graphics.hpp"
 #include "game.h"
-#include "screen.h"
-#include <iostream>
 
 int main()
 {

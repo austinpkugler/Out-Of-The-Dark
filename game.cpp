@@ -189,7 +189,7 @@ void Game::titleScreenInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                // std::cout << "Mouse is pressed" << event.mouseButton.x << " " << event.mouseButton.y << '\n';
+                std::cout << "Mouse is pressed" << event.mouseButton.x << " " << event.mouseButton.y << '\n';
                 float width = m_window->getSize().x;
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= width * 0.10 &&
