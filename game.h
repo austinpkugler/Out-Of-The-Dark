@@ -15,22 +15,22 @@
 class Game
 {
 public:
-    Game();                       // default constructor
+    Game();                             // default constructor
     Game(sf::RenderWindow* window);
-    ~Game();                      // destructor
+    ~Game();                            // destructor
 
-    bool isDone() const;            // public member  function to see if game is done
-    const std::string getName() const;    // public member function to get screen name
-    void load();                    // loads all sprites and stores them in a vector indexed by the order they should be displayed
-    void clearScreen();             // void public member function to clear window
-    void handleInput();             // void public member function to handle all input from keyboard/mouse
-    void update();                  // void public member function to update game objects
-    void render();                  // void public member function to render all game objects
+    bool isDone() const;                // public member function to see if game is done
+    const std::string getName() const;  // public member function to get screen name
+    void load();                        // loads all sprites and stores them in a vector indexed by the order they should be displayed
+    void clearScreen();                 // void public member function to clear window
+    void handleInput();                 // void public member function to handle all input from keyboard/mouse
+    void update();                      // void public member function to update game objects
+    void render();                      // void public member function to render all game objects
     void renderBackground();
-    void loadSettings();            // void public member function to load the settings into the settings struct
-    void updateSettings();          // void public member function to update settings with m_settings info
-    int getFps() const;              // gets the current fps
-    void setFps(int fps);            // sets the game fps
+    void loadSettings();                // void public member function to load the settings into the settings struct
+    void updateSettings();              // void public member function to update settings with m_settings info
+    int getFps() const;                 // gets the current fps
+    void setFps(int fps);               // sets the game fps
 
 private:
     sf::RenderWindow* m_window;     // window for screen
@@ -39,14 +39,13 @@ private:
     Settings m_settings;            // settings such as display fps, etc.
     int m_fps;
     sf::Font m_font;                // generic font to be used
-
+    sf::Music music;
 
     // TITLE SCREEN RESOURCES
     void titleScreenUpdate();       // private member function to update thngs on title screen
     void titleScreenLoad();         // private member function to load the title screen assets
     void titleScreenInput();        // private member function to do title screen input if screen is title screen
     sf::Texture m_titleScreenBg;
-    sf::Music mainTheme;
 
     // PLAY SCREEN RESOURCES
     std::vector<std::string> getAllSaves();

@@ -83,6 +83,7 @@ void Game::update()
 void Game::render()
 {
     renderBackground();
+
     if (m_settings.showFps == true)
     {
         sf::Text text;
@@ -97,7 +98,6 @@ void Game::render()
 void Game::renderBackground()
 {
     m_window->draw(m_backgroundSprite);
-    
 }
 
 void Game::clearScreen()
@@ -140,11 +140,16 @@ void Game::updateSettings()
     const char comma = ',';
     std::string parameterName;
     file << "PLAY_MUSIC" << comma << m_settings.playMusic << '\n';
-    file << "PLAY_AUDIO" << comma << m_settings.playAudio << '\n';;
-    file << "DIFFICULTY" << comma << m_settings.difficulty << '\n';;
-    file << "USERNAME" << comma << m_settings.username << '\n';;
-    file << "FRAME_RATE" << comma << m_settings.frameRate << '\n';;
-    file << "SHOW_FPS" << comma << m_settings.showFps << '\n';;
+    file << "PLAY_AUDIO" << comma << m_settings.playAudio << '\n';
+    file << "DIFFICULTY" << comma << m_settings.difficulty << '\n';
+    file << "USERNAME" << comma << m_settings.username << '\n';
+    file << "FRAME_RATE" << comma << m_settings.frameRate << '\n';
+    file << "SHOW_FPS" << comma << m_settings.showFps << '\n';
+    if (!m_settings.playMusic)
+    {
+        music.stop();
+        std::cout << "Game: Stopped all music playback\n";
+    }
     file.close();
 }
 
@@ -167,13 +172,16 @@ void Game::titleScreenLoad()
     m_backgroundSprite.setTexture(m_titleScreenBg);
     std::cout << "Game: Title screen loaded\n";
 
-    // if (!mainTheme.openFromFile("assets/main_theme.wav"))
-    // {
-    //     std::exit(1);
-    // }
-    // mainTheme.setVolume(10.f);
-    // mainTheme.setLoop(true);
-    // mainTheme.play();
+    if (m_settings.playMusic)
+    {
+        if (!music.openFromFile("assets/clicked.wav"))
+        {
+            std::exit(1);
+        }
+        music.setVolume(10.f);
+        music.setLoop(true);
+        music.play();
+    }
 }
 
 void Game::titleScreenInput()
@@ -390,6 +398,7 @@ void Game::settingsScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings.playMusic = false;
+                        std::cout << m_settings.playMusic << '\n';
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)

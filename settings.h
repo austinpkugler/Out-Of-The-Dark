@@ -4,8 +4,8 @@ struct Settings
 {
     bool playMusic;
     bool playAudio;
-    int difficulty;
+    unsigned int difficulty;
     std::string username;
-    int frameRate;
+    unsigned int frameRate;
     bool showFps;
 };
