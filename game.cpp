@@ -15,17 +15,15 @@ Game::Game(sf::RenderWindow* window)
 {
     m_screenName = "title_screen";
     m_window = window;
+    loadSettings();
     load();
     m_backgroundSprite.setScale(m_window->getSize().x / m_backgroundSprite.getLocalBounds().width,
                                 m_window->getSize().y / m_backgroundSprite.getLocalBounds().height);
-    loadSettings();
     getAllSaves();
-
 }
 
 void Game::load()
 {
-    std::cout << "screen Name at 60" << m_screenName;
     if (m_screenName == "title_screen")
     {
         std::cout << "Game: Loading title screen\n";
@@ -123,12 +121,12 @@ bool Game::isDone() const
 void Game::loadSettings()
 {
     std::fstream file("user_data/settings.csv", std::ios::in);
-    char comma;
+    char comma = ',';
     std::string parameterName;
+
     file >> parameterName >> m_settings.playMusic;
     file >> parameterName >> m_settings.playAudio;
     file >> parameterName >> m_settings.difficulty;
-    file >> parameterName >> m_settings.username;
     file >> parameterName >> m_settings.frameRate;
     file >> parameterName >> m_settings.showFps;
     file.close();
@@ -138,19 +136,45 @@ void Game::updateSettings()
 {
     std::fstream file("user_data/settings.csv", std::ios::out);
     const char comma = ',';
-    std::string parameterName;
-    file << "PLAY_MUSIC" << comma << m_settings.playMusic << '\n';
-    file << "PLAY_AUDIO" << comma << m_settings.playAudio << '\n';
-    file << "DIFFICULTY" << comma << m_settings.difficulty << '\n';
-    file << "USERNAME" << comma << m_settings.username << '\n';
-    file << "FRAME_RATE" << comma << m_settings.frameRate << '\n';
-    file << "SHOW_FPS" << comma << m_settings.showFps << '\n';
+    file << "PLAY_MUSIC" << comma << ' ' << m_settings.playMusic << '\n';
+    file << "PLAY_AUDIO" << comma << ' ' << m_settings.playAudio << '\n';
+    file << "DIFFICULTY" << comma << ' ' << m_settings.difficulty << '\n';
+    file << "FRAME_RATE" << comma << ' ' << m_settings.frameRate << '\n';
+    file << "SHOW_FPS" << comma << ' ' << m_settings.showFps << '\n';
+
     if (!m_settings.playMusic)
     {
         music.stop();
         std::cout << "Game: Stopped all music playback\n";
     }
     file.close();
+}
+
+std::vector<std::string> Game::getAllSaves()
+{
+    std::vector<std::string> saveFiles;
+    std::fstream file("user_data/one.save", std::ios::in);
+    if (!file.fail())
+    {
+        saveFiles.push_back("one.save");
+    }
+    file.close();
+
+    file.open("user_data/two.save", std::ios::in);
+    if (!file.fail())
+    {
+        saveFiles.push_back("two.save");
+    }
+    file.close();
+
+    file.open("user_data/three.save", std::ios::in);
+    if (!file.fail())
+    {
+        saveFiles.push_back("three.save");
+    }
+    file.close();
+
+    return saveFiles;
 }
 
 /*******************************************************************************
@@ -172,8 +196,10 @@ void Game::titleScreenLoad()
     m_backgroundSprite.setTexture(m_titleScreenBg);
     std::cout << "Game: Title screen loaded\n";
 
+    std::cout << "m_settings.playMusic : " << m_settings.playMusic << '\n';
     if (m_settings.playMusic)
     {
+        std::cout << "Title Screen: Playing music\n";
         if (!music.openFromFile("assets/clicked.wav"))
         {
             std::exit(1);
@@ -197,7 +223,6 @@ void Game::titleScreenInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                std::cout << "Mouse is pressed" << event.mouseButton.x << " " << event.mouseButton.y << '\n';
                 float width = m_window->getSize().x;
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= width * 0.10 &&
@@ -234,33 +259,6 @@ void Game::titleScreenInput()
  * 
  * 
  ******************************************************************************/
-
-std::vector<std::string> Game::getAllSaves()
-{
-    std::vector<std::string> saveFiles;
-    std::fstream file("user_data/one.save", std::ios::in);
-    if (!file.fail())
-    {
-        saveFiles.push_back("one.save");
-    }
-    file.close();
-
-    file.open("user_data/two.save", std::ios::in);
-    if (!file.fail())
-    {
-        saveFiles.push_back("two.save");
-    }
-    file.close();
-
-    file.open("user_data/three.save", std::ios::in);
-    if (!file.fail())
-    {
-        saveFiles.push_back("three.save");
-    }
-    file.close();
-
-    return saveFiles;
-}
 
 void Game::playScreenInput()
 {
