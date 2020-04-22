@@ -30,16 +30,16 @@ public:
     void loadSettings();                // void public member function to load the settings into the settings struct
     void updateSettings();              // void public member function to update settings with m_settings info
     int getFps() const;                 // gets the current fps
-    void setFps(int fps);               // sets the game fps
+    void setFps(unsigned int);               // sets the game fps
 
 private:
     sf::RenderWindow* m_window;     // window for screen
     sf::Sprite m_backgroundSprite;
     std::string m_screenName;       // name of screen
     Settings m_settings;            // settings such as display fps, etc.
-    int m_fps;
+    unsigned int m_fps;
     sf::Font m_font;                // generic font to be used
-    sf::Music music;
+    sf::Music m_music;
 
     // TITLE SCREEN RESOURCES
     void titleScreenUpdate();       // private member function to update thngs on title screen

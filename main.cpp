@@ -5,11 +5,12 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
+    window.setFramerateLimit(60);
     sf::Clock clock;
-    float lastTime = 0;
-    float currentTime = 0;
-    float fps = 0;
     Game game(&window);
+    
+    sf::Time time;
+    int fps = 0;
 
     while(!game.isDone())
     {
@@ -19,11 +20,11 @@ int main()
         game.render();
         window.display();
 
-        // calculate and store fps
-        currentTime = clock.restart().asSeconds();
-        fps = 1 / (currentTime - lastTime);
-        lastTime = currentTime;
+        // Calculate and store fps
+        time = clock.getElapsedTime();
+        fps = 1.0f / time.asSeconds();
         game.setFps(fps);
+        clock.restart().asSeconds();
     }
 
     return 0;

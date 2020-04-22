@@ -24,6 +24,11 @@ Game::Game(sf::RenderWindow* window)
 
 void Game::load()
 {
+    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    {
+        std::exit(1);
+    }
+
     if (m_screenName == "title_screen")
     {
         std::cout << "Game: Loading title screen\n";
@@ -108,7 +113,7 @@ int Game::getFps() const
     return m_fps;
 }
 
-void Game::setFps(int fps)
+void Game::setFps(unsigned int fps)
 {
     m_fps = fps;
 }
@@ -144,7 +149,7 @@ void Game::updateSettings()
 
     if (!m_settings.playMusic)
     {
-        music.stop();
+        m_music.stop();
         std::cout << "Game: Stopped all music playback\n";
     }
     file.close();
@@ -200,13 +205,13 @@ void Game::titleScreenLoad()
     if (m_settings.playMusic)
     {
         std::cout << "Title Screen: Playing music\n";
-        if (!music.openFromFile("assets/clicked.wav"))
+        if (!m_music.openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
         {
             std::exit(1);
         }
-        music.setVolume(10.f);
-        music.setLoop(true);
-        music.play();
+        m_music.setVolume(20.f);
+        m_music.setLoop(true);
+        m_music.play();
     }
 }
 
