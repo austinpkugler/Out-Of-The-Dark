@@ -27,6 +27,7 @@ public:
     void update();                      // void public member function to update game objects
     void render();                      // void public member function to render all game objects
     void renderBackground();
+    void renderSettings();
     void loadSettings();                // void public member function to load the settings into the settings struct
     void updateSettings();              // void public member function to update settings with m_settings info
     int getFps() const;                 // gets the current fps
@@ -34,6 +35,8 @@ public:
 
 private:
     sf::RenderWindow* m_window;     // window for screen
+    float m_width;
+    float m_height;
     sf::Sprite m_backgroundSprite;
     std::string m_screenName;       // name of screen
     Settings m_settings;            // settings such as display fps, etc.

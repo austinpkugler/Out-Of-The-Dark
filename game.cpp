@@ -15,6 +15,8 @@ Game::Game(sf::RenderWindow* window)
 {
     m_screenName = "title_screen";
     m_window = window;
+    m_width = m_window->getSize().x;
+    m_height = m_window->getSize().y;
     loadSettings();
     load();
     m_backgroundSprite.setScale(m_window->getSize().x / m_backgroundSprite.getLocalBounds().width,
@@ -87,6 +89,11 @@ void Game::render()
 {
     renderBackground();
 
+    if (m_screenName == "settings_screen")
+    {
+        renderSettings();
+    }
+
     if (m_settings.showFps == true)
     {
         sf::Text text;
@@ -101,6 +108,74 @@ void Game::render()
 void Game::renderBackground()
 {
     m_window->draw(m_backgroundSprite);
+}
+
+void Game::renderSettings()
+{
+    sf::RectangleShape rectangle(sf::Vector2f(m_width * 0.09, m_height * 0.05));
+    rectangle.setFillColor(sf::Color(0, 0, 0, 0));
+    rectangle.setOutlineColor(sf::Color(255, 255, 255));
+    rectangle.setOutlineThickness(2);
+    if (m_settings.playMusic)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.25);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.25);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings.playAudio)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.35);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.35);
+        m_window->draw(rectangle);
+    }
+    
+
+    if (m_settings.difficulty)
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.45);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.45);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings.frameRate == 30)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+    else if (m_settings.frameRate == 60)
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+    else if (m_settings.frameRate == 120)
+    {
+        rectangle.setPosition(m_width * 0.5, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings.showFps)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.65);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.65);
+        m_window->draw(rectangle);
+    }
 }
 
 void Game::clearScreen()
@@ -201,7 +276,6 @@ void Game::titleScreenLoad()
     m_backgroundSprite.setTexture(m_titleScreenBg);
     std::cout << "Game: Title screen loaded\n";
 
-    std::cout << "m_settings.playMusic : " << m_settings.playMusic << '\n';
     if (m_settings.playMusic)
     {
         std::cout << "Title Screen: Playing music\n";
@@ -394,7 +468,7 @@ void Game::settingsScreenInput()
                         m_settings.showFps = true;
                     }
                 }
-                else if (event.mouseButton.x >= width * 0.4 &&
+                else if (event.mouseButton.x >= width * 0.40 &&
                          event.mouseButton.x <= width * 0.48)
                 {
                     if (event.mouseButton.y >= height * 0.25 &&
