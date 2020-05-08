@@ -104,6 +104,10 @@ void Game::render()
     if (m_settings.showFps && m_frameCount % (m_settings.frameRate / 4) == 0)
     {
         m_displayedFps = m_fps;
+        if (m_displayedFps > m_settings.frameRate)
+        {
+            m_displayedFps = m_settings.frameRate;
+        }
     }
     if (m_settings.showFps)
     {
