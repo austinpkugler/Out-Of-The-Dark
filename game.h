@@ -43,6 +43,7 @@ private:
     unsigned int m_fps;
     sf::Font m_font;                // generic font to be used
     sf::Music m_music;
+    sf::Sound m_sound;
 
     // TITLE SCREEN RESOURCES
     void titleScreenUpdate();       // private member function to update thngs on title screen

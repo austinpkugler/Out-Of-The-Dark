@@ -137,7 +137,6 @@ void Game::renderSettings()
         rectangle.setPosition(m_width * 0.4, m_height * 0.35);
         m_window->draw(rectangle);
     }
-    
 
     if (m_settings.difficulty)
     {
@@ -276,7 +275,7 @@ void Game::titleScreenLoad()
     m_backgroundSprite.setTexture(m_titleScreenBg);
     std::cout << "Game: Title screen loaded\n";
 
-    if (m_settings.playMusic)
+    if (m_settings.playMusic && m_music.getStatus() == sf::Music::Status::Stopped)
     {
         std::cout << "Title Screen: Playing music\n";
         if (!m_music.openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
