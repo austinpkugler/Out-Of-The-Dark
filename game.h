@@ -9,8 +9,8 @@
 #include <cstdio>
 #include <iostream> // used for debugging
 #include <windows.h>
-
 #include "settings.h"
+#include "screen.h"
 
 class Game
 {
@@ -20,7 +20,6 @@ public:
     ~Game();                            // destructor
 
     bool isDone() const;                // public member function to see if game is done
-    const std::string getName() const;  // public member function to get screen name
     void load();                        // loads all sprites and stores them in a vector indexed by the order they should be displayed
     void clearScreen();                 // void public member function to clear window
     void handleInput();                 // void public member function to handle all input from keyboard/mouse
@@ -37,8 +36,9 @@ public:
 private:
     sf::RenderWindow* m_window;     // window for screen
     sf::Sprite m_backgroundSprite;
+    Screen* m_screen;
     std::string m_screenName;       // name of screen
-    Settings m_settings;            // settings such as display fps, etc.
+    Settings* m_settings;            // settings such as display fps, etc.
     sf::Font m_font;                // generic font to be used
     sf::Music m_music;
     sf::SoundBuffer m_soundBuffer;

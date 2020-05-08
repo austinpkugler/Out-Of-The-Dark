@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+
 struct Settings
 {
     bool playMusic;
