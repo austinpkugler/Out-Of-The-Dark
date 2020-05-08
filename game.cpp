@@ -26,8 +26,15 @@ Game::Game(sf::RenderWindow* window)
 
 void Game::load()
 {
+    if (!m_soundBuffer.loadFromFile("assets/clicked.wav"))
+    {
+        std::cout << "Game: Failed to load asset clicked.wav\n";
+        std::exit(1);
+    }
+
     if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
     {
+        std::cout << "Game: Failed to load asset rm_typerighter.ttf\n";
         std::exit(1);
     }
 
@@ -190,6 +197,17 @@ int Game::getFps() const
 void Game::setFps(unsigned int fps)
 {
     m_fps = fps;
+}
+
+void Game::playSoundBuffer()
+{
+    if (m_settings.playAudio)
+    {
+        sf::Sound sound;
+        sound.setBuffer(m_soundBuffer);
+        sound.play();
+        std::cout << "Audio: Playing sound effect from buffer\n";
+    }
 }
 
 bool Game::isDone() const

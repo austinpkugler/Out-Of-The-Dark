@@ -32,6 +32,7 @@ public:
     void updateSettings();              // void public member function to update settings with m_settings info
     int getFps() const;                 // gets the current fps
     void setFps(unsigned int);               // sets the game fps
+    void playSoundBuffer();
 
 private:
     sf::RenderWindow* m_window;     // window for screen
@@ -43,7 +44,7 @@ private:
     unsigned int m_fps;
     sf::Font m_font;                // generic font to be used
     sf::Music m_music;
-    sf::Sound m_sound;
+    sf::SoundBuffer m_soundBuffer;
 
     // TITLE SCREEN RESOURCES
     void titleScreenUpdate();       // private member function to update thngs on title screen
