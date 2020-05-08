@@ -36,15 +36,18 @@ public:
 
 private:
     sf::RenderWindow* m_window;     // window for screen
-    float m_width;
-    float m_height;
     sf::Sprite m_backgroundSprite;
     std::string m_screenName;       // name of screen
     Settings m_settings;            // settings such as display fps, etc.
-    unsigned int m_fps;
     sf::Font m_font;                // generic font to be used
     sf::Music m_music;
     sf::SoundBuffer m_soundBuffer;
+    unsigned int m_fps = 0;
+    unsigned int m_displayedFps = 0;
+    unsigned int m_frameCount = 0;
+    float m_width;
+    float m_height;
+    
 
     // TITLE SCREEN RESOURCES
     void titleScreenUpdate();       // private member function to update thngs on title screen

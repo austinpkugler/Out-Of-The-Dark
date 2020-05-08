@@ -101,15 +101,22 @@ void Game::render()
         renderSettings();
     }
 
-    if (m_settings.showFps == true)
+    if (m_settings.showFps && m_frameCount % (m_settings.frameRate / 4) == 0)
+    {
+        m_displayedFps = m_fps;
+    }
+    if (m_settings.showFps)
     {
         sf::Text text;
+        
         text.setFont(m_font);
         char c[10];
-        sprintf(c, "%i", m_fps);
+        sprintf(c, "%i", m_displayedFps);
         text.setString(c);
+        text.setPosition(15, 0);
         m_window->draw(text);
     }
+    m_frameCount++;
 }
 
 void Game::renderBackground()
@@ -238,7 +245,7 @@ void Game::updateSettings()
     file << "DIFFICULTY" << comma << ' ' << m_settings.difficulty << '\n';
     file << "FRAME_RATE" << comma << ' ' << m_settings.frameRate << '\n';
     file << "SHOW_FPS" << comma << ' ' << m_settings.showFps << '\n';
-
+    m_window->setFramerateLimit(m_settings.frameRate);
     if (!m_settings.playMusic)
     {
         m_music.stop();
