@@ -10,11 +10,12 @@
 #include <iostream>
 #include <windows.h>
 #include "settings.h"
-#include "screen.h"
-class uiClass:public Screen
+#include "section.h"
+class Menu:public Section
 {
 public:
-    uiClass(sf::RenderWindow* window, Settings* settings, float width, float height);
+    Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height);
+    ~Menu();                          // destructor
     virtual void load();              // overrides Screen::load()
     virtual void update();            // overrides Screen::update()
     virtual void handleInput();       // overrides Screen::handleInput()
@@ -26,8 +27,11 @@ private:
     void settingsScreenInput();
 
     void renderSettingsScreen();      // renders the settings page
-    void updateSettings();            // updates the settings struct
+
+    void updateSettingsStruct();     // updates the settings struct
+    void loadSettingsStruct();       // loads setting struct from file
 
     sf::Sprite m_backgroundSprite;
-    sf::Texture m_backgroundTexture;
+    sf::Texture* m_backgroundTexture;
+    sf::Music* m_music;
 };

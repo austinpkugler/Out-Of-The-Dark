@@ -1,19 +1,31 @@
-#include "uiClass.h"
+#include "menu.h"
 
-uiClass::uiClass(sf::RenderWindow* window, Settings* settings, float width, float height)
+Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height)
 {
     m_window = window;
     m_settings = settings;
+    m_music = music;
     m_width = width;
     m_height = height;
     m_screenName = "title_screen";
+    m_sectionName = "menu";
+    m_backgroundTexture = new sf::Texture();
+    load();
 }
 
-void uiClass::load()
+Menu::~Menu()
 {
+    delete m_backgroundTexture;
+
+}
+
+void Menu::load()
+{
+
     if (m_screenName == "title_screen")
     {
-        if (!m_backgroundTexture.loadFromFile("assets/title_screen_background.png"))
+
+        if (!m_backgroundTexture->loadFromFile("assets/title_screen_background.png"))
         {
             std::exit(1);
         }
@@ -21,24 +33,25 @@ void uiClass::load()
     }
     else if (m_screenName == "play_screen")
     {
-        if (!m_backgroundTexture.loadFromFile("assets/play_screen_background.png"))
-        {
+        if (!m_backgroundTexture->loadFromFile("assets/play_screen_background.png"))
+            {
             std::exit(1);
         }
     }
     else if (m_screenName == "settings_screen")
     {
-        if (!m_backgroundTexture.loadFromFile("assets/settings_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("assets/settings_screen_background.png"))
         {
             std::exit(1);
         }
     }
-    m_backgroundSprite.setTexture(m_backgroundTexture);
+
+    m_backgroundSprite.setTexture(*m_backgroundTexture);
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
                                 m_height / m_backgroundSprite.getLocalBounds().height);
 }
 
-void uiClass::handleInput()
+void Menu::handleInput()
 {
     if (m_screenName == "title_screen")
     {
@@ -54,15 +67,12 @@ void uiClass::handleInput()
     }
 }
 
-void uiClass::update()
+void Menu::update()
 {
-    m_backgroundSprite.setTexture(m_backgroundTexture);
 }
 
-void uiClass::render()
+void Menu::render()
 {
-        m_backgroundSprite.setTexture(m_backgroundTexture);
-
     m_window->draw(m_backgroundSprite); // draws background
     if (m_screenName == "settings_screen")
     {
@@ -70,7 +80,7 @@ void uiClass::render()
     }
 }
 
-void uiClass::renderSettingsScreen()
+void Menu::renderSettingsScreen()
 {
     sf::RectangleShape rectangle(sf::Vector2f(m_width * 0.09, m_height * 0.05));
     rectangle.setFillColor(sf::Color(0, 0, 0, 0));
@@ -137,21 +147,21 @@ void uiClass::renderSettingsScreen()
     }
 }
 
-void uiClass::updateSettings()
+void Menu::updateSettingsStruct()
 {
     std::fstream file("user_data/settings.csv", std::ios::out);
     const char comma = ',';
-    file << "PLAY_MUSIC" << comma << ' ' << m_settings->playMusic << '\n';
-    file << "PLAY_AUDIO" << comma << ' ' << m_settings->playAudio << '\n';
-    file << "DIFFICULTY" << comma << ' ' << m_settings->difficulty << '\n';
-    file << "FRAME_RATE" << comma << ' ' << m_settings->frameRate << '\n';
-    file << "SHOW_FPS" << comma << ' ' << m_settings->showFps << '\n';
+    file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
+    file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
+    file << "DIFFICULTY, " << m_settings->difficulty << '\n';
+    file << "FRAME_RATE, " << m_settings->frameRate << '\n';
+    file << "SHOW_FPS, " << m_settings->showFps << '\n';
     m_window->setFramerateLimit(m_settings->frameRate);
 
     file.close();
 }
 
-void uiClass::titleScreenInput()
+void Menu::titleScreenInput()
 {
     sf::Event event;
     while(m_window->pollEvent(event))
@@ -167,7 +177,7 @@ void uiClass::titleScreenInput()
                 float width = m_window->getSize().x;
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= width * 0.10 &&
-                    event.mouseButton.x <= width * 0.25)
+                    event.mouseButton.x <= width * 0.28)
                 {
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.3)
@@ -186,6 +196,12 @@ void uiClass::titleScreenInput()
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.5)
                     {
+                        std::cout << "Game: 'Maze builder' button pressed\n";
+                        m_sectionName = "maze_builder";
+                    }
+                    else if (event.mouseButton.y >= height * 0.55 &&
+                             event.mouseButton.y <= height * 0.6)
+                    {
                         std::cout << "Game: 'Quit' button pressed\n";
                         m_window->close();
                     }
@@ -195,7 +211,7 @@ void uiClass::titleScreenInput()
     }
 }
 
-void uiClass::playScreenInput()
+void Menu::playScreenInput()
 {
     sf::Event event;
     while(m_window->pollEvent(event))
@@ -244,7 +260,7 @@ void uiClass::playScreenInput()
     }
 }
 
-void uiClass::settingsScreenInput()
+void Menu::settingsScreenInput()
 {
     sf::Event event;
     while(m_window->pollEvent(event))
@@ -266,6 +282,11 @@ void uiClass::settingsScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = true;
+                        if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
+                        {
+                            m_music->play();
+                            std::cout << "Game: Playing all music playback\n";
+                        }
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
@@ -275,7 +296,7 @@ void uiClass::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        m_settings->difficulty = 0; // 0 difficulty includes radar, 1 does not
+                        m_settings->difficulty = 0;
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
@@ -295,7 +316,11 @@ void uiClass::settingsScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = false;
-                        // std::cout << m_settings->playMusic << '\n';
+                        if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
+                        {
+                            m_music->stop();
+                            std::cout << "Game: Stopped all music playback\n";
+                        }
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
@@ -333,7 +358,7 @@ void uiClass::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
-                        updateSettings();
+                        updateSettingsStruct();
                         m_screenName = "title_screen";
                         load();
                     }
