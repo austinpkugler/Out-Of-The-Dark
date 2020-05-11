@@ -1,7 +1,6 @@
-// Command: g++ -std=c++11 main.cpp game.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+// Command: g++ -std=c++11 main.cpp game.cpp uiClass.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 #include "SFML/Graphics.hpp"
 #include "game.h"
-#include <iostream>
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
@@ -25,6 +24,8 @@ int main()
         fps = 1.0f / time.asSeconds();
         game.setFps(fps);
         clock.restart().asSeconds();
+
+
     }
 
     return 0;
