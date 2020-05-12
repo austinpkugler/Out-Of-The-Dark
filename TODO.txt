@@ -6,3 +6,8 @@ TODO:
 	make collision work
 
 	currently the collision check for the player is wrong ):
+
+
+
+    click to restart breaks it sometimes
+    fire no burny

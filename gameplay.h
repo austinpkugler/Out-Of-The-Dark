@@ -50,7 +50,7 @@ private:
     void pausedScreenInput();
     void calculatePlayerVelocity();
     bool playerWon();
-    void renderSettings();
+    void resetLevel();
     const GameObject blockMouseIsOn() const;
     std::vector<GameObject> blocksPlayerIsOn() const;
 

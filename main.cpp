@@ -4,10 +4,8 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
-    
     sf::Clock clock;
     Game game(&window);
-    
     sf::Time time;
     int fps = 0;
 
@@ -24,8 +22,6 @@ int main()
         fps = 1.0f / time.asSeconds();
         game.setFps(fps);
         clock.restart().asSeconds();
-
-
     }
 
     return 0;

@@ -54,8 +54,8 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
     upperLeftSquare.x = startingBlock.x - (objectsToDisplay - 1) / 2.0f;
     upperLeftSquare.y = startingBlock.y - ((objectsToDisplay / m_width) * m_height-1) / 2.0f;
 
-    std::cout << upperLeftSquare.x << " " << upperLeftSquare.y << '\n';
-    std::cout << startingBlock.x << " " << startingBlock.y << '\n';
+    // std::cout << upperLeftSquare.x << " " << upperLeftSquare.y << '\n';
+    // std::cout << startingBlock.x << " " << startingBlock.y << '\n';
     
     sf::Vector2f playerCoords = indexToCoord(startingBlock.x, startingBlock.y);
     player.x = playerCoords.x + 0.5 * squareSize - gridOffset.x;
@@ -68,7 +68,6 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
     m_squareToMoveTo.setSize(sf::Vector2f(squareSize, squareSize));
     m_squareToMoveTo.setFillColor(sf::Color(20, 20, 20, 200));
     m_squareToMoveTo.setPosition(-1, -1);
-
 }
 
 /**
@@ -157,7 +156,7 @@ void Gameplay::load()
     }
     player.sprite.setTexture(*player.texturePtr);
     player.sprite.setScale((squareSize / 240.0f) * 0.5, (squareSize / 240.0f) * 0.5);
-    player.sprite.setOrigin(player.sprite.getLocalBounds().width/2, 
+    player.sprite.setOrigin(player.sprite.getLocalBounds().width/2,
                             player.sprite.getLocalBounds().height/2);
 
     deathScreenSprite.setTexture(*deathScreenTexture);
@@ -376,7 +375,7 @@ void Gameplay::applyDamage()
         {
             player.healthPercent -= 0.1;
         }
-    }   
+    }
     if (player.burning && player.burnLength % m_settings->frameRate == 0)
     {
         player.healthPercent -= 5;
@@ -392,10 +391,7 @@ void Gameplay::applyDamage()
     }
     if (player.healthPercent <= 0)
     {
-        player.healthPercent = 0;
-        player.alive = false;
-        load();
-        // reset the player position
+        resetLevel();
     }
 }
 
@@ -478,17 +474,6 @@ void Gameplay::renderGrid()
     }
 }
 
-/**
- * @brief
- * @details
- * @throw
- * @param
- * @return
- */
-void Gameplay::renderSettings()
-{
-
-}
 
 /**
  * @brief
@@ -500,14 +485,33 @@ void Gameplay::renderSettings()
 bool Gameplay::playerWon()
 {
     std::vector<GameObject> objectsStandingOn = blocksPlayerIsOn();
-    for (int i=0; i < objectsStandingOn.size(); ++i)
+    for (int i = 0; i < objectsStandingOn.size(); ++i)
     {
         if (objectsStandingOn[i].textureIndex == 7)
-            {
-                return true;
-            }
+        {
+            return true;
+        }
     }
     return false;
+}
+
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::resetLevel()
+{
+    player.healthPercent = 0;
+    player.alive = false;
+    load();
+    sf::Vector2f playerCoords = indexToCoord(startingBlock.x, startingBlock.y);
+    player.x = playerCoords.x + 0.5 * squareSize - gridOffset.x;
+    player.y = playerCoords.y + 0.5 * squareSize - gridOffset.y;
+    player.sprite.setPosition(player.x, player.y);
+    m_squareToMoveTo.setPosition(-1, -1);
 }
 
 /**
@@ -587,16 +591,16 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
     }
     if (!(x >= GRID_SIZE || x < 0 || y+1 >= GRID_SIZE || y+1 < 0)) // if not out of bounds
     {
-        if (player.y + 0.5*player.sprite.getLocalBounds().height > indexToCoord(x, y+1).y)
+        if (player.y + 0.5 * player.sprite.getLocalBounds().height > indexToCoord(x, y + 1).y)
         {
             blocks.push_back(m_maze[x-1][y+1]);
         }
     }
     for (int i=0; i < blocks.size(); ++i)
     {
-        std::cout << blocks[i].textureIndex << ' ';
+        // std::cout << blocks[i].textureIndex << ' ';
     }
-    std::cout << "\n";
+    // std::cout << "\n";
     return blocks;
 }
 
