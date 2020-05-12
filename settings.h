@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 struct Settings
 {
     bool playMusic;
@@ -7,4 +9,7 @@ struct Settings
     unsigned int difficulty;
     unsigned int frameRate;
     bool showFps;
+    std::string saveSlot1;
+    std::string saveSlot2;
+    std::string saveSlot3;
 };

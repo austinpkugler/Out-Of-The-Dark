@@ -4,7 +4,7 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
-    window.setFramerateLimit(60);
+    
     sf::Clock clock;
     Game game(&window);
     

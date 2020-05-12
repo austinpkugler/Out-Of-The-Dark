@@ -16,7 +16,6 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
 Menu::~Menu()
 {
     delete m_backgroundTexture;
-
 }
 
 void Menu::load()
@@ -46,9 +45,29 @@ void Menu::load()
         }
     }
 
+    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    {
+        std::exit(1);
+    }
+
     m_backgroundSprite.setTexture(*m_backgroundTexture);
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
                                 m_height / m_backgroundSprite.getLocalBounds().height);
+
+    m_saveSlot1Text.setFont(m_font);
+    m_saveSlot1Text.setCharacterSize(32);
+    m_saveSlot1Text.setFillColor(sf::Color::White);
+    m_saveSlot1Text.setPosition(0.15 * m_width, 0.5 * m_height);
+
+    m_saveSlot2Text.setFont(m_font);
+    m_saveSlot2Text.setCharacterSize(32);
+    m_saveSlot2Text.setFillColor(sf::Color::White);
+    m_saveSlot2Text.setPosition(0.45 * m_width, 0.5 * m_height);
+
+    m_saveSlot3Text.setFont(m_font);
+    m_saveSlot3Text.setCharacterSize(32);
+    m_saveSlot3Text.setFillColor(sf::Color::White);
+    m_saveSlot3Text.setPosition(0.76 * m_width, 0.5 * m_height);
 }
 
 void Menu::handleInput()
@@ -77,6 +96,10 @@ void Menu::render()
     if (m_screenName == "settings_screen")
     {
         renderSettingsScreen(); // draws boxes for settings
+    }
+    if (m_screenName == "play_screen")
+    {
+        renderPlayScreen();
     }
 }
 
@@ -147,6 +170,23 @@ void Menu::renderSettingsScreen()
     }
 }
 
+void Menu::renderPlayScreen()
+{
+
+    std::string slot1String = m_settings->saveSlot1.substr(m_settings->saveSlot1.find_last_of("/\\") + 1);
+    std::string slot2String = m_settings->saveSlot2.substr(m_settings->saveSlot2.find_last_of("/\\") + 1);
+    std::string slot3String = m_settings->saveSlot3.substr(m_settings->saveSlot3.find_last_of("/\\") + 1);
+
+    m_saveSlot1Text.setString(slot1String);
+    m_saveSlot2Text.setString(slot2String);
+    m_saveSlot3Text.setString(slot3String);
+
+    m_window->draw(m_saveSlot1Text);
+    m_window->draw(m_saveSlot2Text);
+    m_window->draw(m_saveSlot3Text);
+
+}
+
 void Menu::updateSettingsStruct()
 {
     std::fstream file("user_data/settings.csv", std::ios::out);
@@ -155,7 +195,10 @@ void Menu::updateSettingsStruct()
     file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
     file << "DIFFICULTY, " << m_settings->difficulty << '\n';
     file << "FRAME_RATE, " << m_settings->frameRate << '\n';
-    file << "SHOW_FPS, " << m_settings->showFps << '\n';
+    file << "SHOW_FPS, "   << m_settings->showFps << '\n';
+    file << "SAVESLOT_1, " << m_settings->saveSlot1 << '\n';
+    file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
+    file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
     m_window->setFramerateLimit(m_settings->frameRate);
 
     file.close();
@@ -233,16 +276,22 @@ void Menu::playScreenInput()
                         event.mouseButton.x <= width * 0.31)
                     {
                         std::cout << "Save Slot 1 has been pressed\n";
+                        loadFileToSaveSlot(1);
+                        m_sectionName = "save_slot_1";
                     }
                     else if (event.mouseButton.x >= width * 0.39 &&
                              event.mouseButton.x <= width * 0.61)
                     {
                         std::cout << "Save slot 2 has been pressed\n";
+                        loadFileToSaveSlot(2);
+                        m_sectionName = "save_slot_2";
                     }
                     else if (event.mouseButton.x >= width * 0.69 &&
                              event.mouseButton.x <= width * 0.91)
                     {
                         std::cout << "Save slot 3 has been pressed\n";
+                        loadFileToSaveSlot(3);
+                        m_sectionName = "save_slot_3";
                     }
                 }
                 if (event.mouseButton.y >= height * 0.75 &&
@@ -302,6 +351,7 @@ void Menu::settingsScreenInput()
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 30;
+                        m_window->setFramerateLimit(m_settings->frameRate);
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
@@ -336,6 +386,7 @@ void Menu::settingsScreenInput()
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 60;
+                        m_window->setFramerateLimit(m_settings->frameRate);
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
@@ -350,6 +401,7 @@ void Menu::settingsScreenInput()
                         event.mouseButton.y <= height * 0.6)
                     {
                         m_settings->frameRate = 120;
+                        m_window->setFramerateLimit(m_settings->frameRate);
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.10 &&
@@ -366,4 +418,45 @@ void Menu::settingsScreenInput()
             }
         }
     }
+}
+
+void Menu::loadFileToSaveSlot(int saveSlot)
+{
+    std::string filePath;
+    if (saveSlot == 1)
+    {
+        filePath = m_settings->saveSlot1;
+    }
+    else if (saveSlot == 2)
+    {
+        filePath = m_settings->saveSlot2;
+    }
+    else if (saveSlot == 3)
+    {
+        filePath = m_settings->saveSlot3;
+    }
+
+    filePath = "python getMazeName/openFile.py " + filePath;
+    std::cout << "filePath " << filePath;
+    
+    system(filePath.c_str());
+    std::fstream file("getMazeName/filename.txt", std::ios::in);
+    getline(file, filePath);
+    file.close();
+
+    if (saveSlot == 1)
+    {
+        m_settings->saveSlot1 = filePath;
+    }
+    else if (saveSlot == 2)
+    {
+        m_settings->saveSlot2 = filePath;
+    }
+    else if (saveSlot == 3)
+    {
+        m_settings->saveSlot3 = filePath;
+    }
+
+    updateSettingsStruct();
+
 }

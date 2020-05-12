@@ -21,7 +21,7 @@ struct gridStruct
 };
 
 
-class MazeBuilder:public Section
+class MazeBuilder: public Section
 {
 public:
     MazeBuilder(sf::RenderWindow* window, Settings* settings, float width, float height);
@@ -66,7 +66,6 @@ private:
 
     sf::RectangleShape m_textureHighlightRect; // rect for highlighting textures
     sf::RectangleShape m_highlightedGridRect;
-    float m_width, m_height; // original width and height when everything is loaded (necessary because scaling)
 
     sf::Font m_font;
     sf::Text m_gridLocation;

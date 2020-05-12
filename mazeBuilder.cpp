@@ -19,8 +19,8 @@ MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float wid
     m_upperLeftSquare.x = m_MAX_GRID_SIZE/2;
     m_upperLeftSquare.y = m_MAX_GRID_SIZE/2;
     m_squaresToDisplay = 25;
-    m_mazeOrigin.x = 0.2*m_width;  // left edge of grid
-    m_mazeOrigin.y = 0.1*m_height; // top edge of grid
+    m_mazeOrigin.x = 0.2 * m_width;  // left edge of grid
+    m_mazeOrigin.y = 0.1 * m_height; // top edge of grid
     m_squareSize = static_cast<float>(std::max(m_width - m_mazeOrigin.x, m_height - m_mazeOrigin.y)) / m_squaresToDisplay;
 
     // highlighted square when mouse is on grid
@@ -204,7 +204,7 @@ bool MazeBuilder::isMouseOnBlock(const gridStruct& block) const
 
     float mouseX = sf::Mouse::getPosition(*m_window).x;
     float mouseY = sf::Mouse::getPosition(*m_window).y;
-    mouseX /=m_window->getSize().x;
+    mouseX /= m_window->getSize().x;
     mouseY /= m_window->getSize().y;
     mouseX *= m_width;
     mouseY *= m_height;

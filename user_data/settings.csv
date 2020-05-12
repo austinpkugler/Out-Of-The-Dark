@@ -1,5 +1,8 @@
-PLAY_MUSIC, 1
-PLAY_AUDIO, 1
+PLAY_MUSIC, 0
+PLAY_AUDIO, 0
 DIFFICULTY, 0
-FRAME_RATE, 120
+FRAME_RATE, 30
 SHOW_FPS, 1
+SAVESLOT_1,  C:/Users/Hayden Carroll/Desktop/PA-6/levels/maze_1.maze
+SAVESLOT_2,                                                      C:/Users/Hayden Carroll/Desktop/level-editor-for-pa6/levels/maze_1.maze
+SAVESLOT_3, 

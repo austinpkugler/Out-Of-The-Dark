@@ -18,6 +18,7 @@ Game::Game(sf::RenderWindow* window)
     load();
     m_section = new Menu(m_window, m_settings, m_music, m_width, m_height);
     m_sectionName = "maze_builder";
+    m_window->setFramerateLimit(m_settings->frameRate);
 }
 
 /**
@@ -85,7 +86,7 @@ void Game::handleInput()
 }
 
 /**
- * @brief Updates the game based on the current game state.
+ * @brief Updates the game based on the current state.
  * @details The update function of the current section is called. If the
  * section name does not match the child's section name, then update the parent
  * section name. The previous section is deleted and replaced with the new
@@ -105,15 +106,27 @@ void Game::update()
         {
             m_section = new Menu(m_window, m_settings, m_music, m_width, m_height);
         }
-        if (m_sectionName == "maze_builder")
+        else if (m_sectionName == "maze_builder")
         {
             m_section = new MazeBuilder(m_window, m_settings, m_width, m_height);
+        }
+        else if (m_sectionName == "save_slot_1")
+        {
+            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot1, 1);
+        }
+        else if (m_sectionName == "save_slot_2")
+        {
+            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot2, 2);
+        }
+        else if (m_sectionName == "save_slot_3")
+        {
+            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot3, 3);
         }
     }
 }
 
 /**
- * @brief Displays the game assets to the screen.
+ * @brief Displays all game assets to the screen.
  * @details The render function of the current section is called to display all
  * game assets (backgrounds, sprites, etc.). FPS is then displayed if display
  * FPS is true.
@@ -135,12 +148,11 @@ void Game::render()
     if (m_settings->showFps)
     {
         sf::Text text;
-        
         text.setFont(m_font);
         char c[10];
         sprintf(c, "%i", m_displayedFps);
         text.setString(c);
-        text.setPosition(15, 0);
+        text.setPosition(15, -15);
         m_window->draw(text);
     }
     m_frameCount++;
@@ -239,6 +251,14 @@ void Game::loadSettingsStruct()
     file >> parameterName >> m_settings->difficulty;
     file >> parameterName >> m_settings->frameRate;
     file >> parameterName >> m_settings->showFps;
+    file >> parameterName;
+    getline(file, m_settings->saveSlot1);
+    file >> parameterName;
+    getline(file, m_settings->saveSlot2);
+    file >> parameterName;
+    getline(file, m_settings->saveSlot3);
+
+    std::cout << "struct2 " << m_settings->saveSlot2; 
 
     file.close();
 }
