@@ -23,6 +23,7 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
     deathScreenTexture = new sf::Texture();
     hardModeTexture = new sf::Texture();
     pausedScreenTexture = new sf::Texture();
+    settingsScreenTexture = new sf::Texture();
     
     if (saveSlot == 1)
     {
@@ -149,27 +150,32 @@ void Gameplay::load()
         std::cout << "Gameplay: Failed to load asset 'hard_mode_background.png'\n";
         std::exit(1);
     }
-    if (!pausedScreenTexture->loadFromFile("assets/settings_screen_overlay_background.png"))
+    if (!pausedScreenTexture->loadFromFile("assets/paused_screen_background.png"))
     {
-        std::cout << "Gameplay: Failed to load asset 'settings_screen_overlay_background.png'\n";
+        std::cout << "Gameplay: Failed to load asset 'paused_screen_background.png'\n";
         std::exit(1);
     }
+    if (!settingsScreenTexture->loadFromFile("assets/settings_screen_background.png"))
+    {
+        std::cout << "Gameplay: Failed to load asset 'settings_screen_background.png'\n";
+        std::exit(1);
+    }
+
     player.sprite.setTexture(*player.texturePtr);
     player.sprite.setScale((squareSize / 240.0f) * 0.5, (squareSize / 240.0f) * 0.5);
-    player.sprite.setOrigin(player.sprite.getLocalBounds().width/2,
-                            player.sprite.getLocalBounds().height/2);
+    player.sprite.setOrigin(player.sprite.getLocalBounds().width / 2, player.sprite.getLocalBounds().height / 2);
 
     deathScreenSprite.setTexture(*deathScreenTexture);
-    deathScreenSprite.setScale(m_width / deathScreenSprite.getLocalBounds().width,
-                                m_height / deathScreenSprite.getLocalBounds().height);
+    deathScreenSprite.setScale(m_width / deathScreenSprite.getLocalBounds().width, m_height / deathScreenSprite.getLocalBounds().height);
 
     hardModeSprite.setTexture(*hardModeTexture);
-    hardModeSprite.setScale(m_width / hardModeSprite.getLocalBounds().width,
-                                m_height / hardModeSprite.getLocalBounds().height);
+    hardModeSprite.setScale(m_width / hardModeSprite.getLocalBounds().width, m_height / hardModeSprite.getLocalBounds().height);
 
     pausedScreenSprite.setTexture(*pausedScreenTexture);
-    pausedScreenSprite.setScale(m_width / pausedScreenSprite.getLocalBounds().width,
-                                m_height / pausedScreenSprite.getLocalBounds().height);
+    pausedScreenSprite.setScale(m_width / pausedScreenSprite.getLocalBounds().width, m_height / pausedScreenSprite.getLocalBounds().height);
+
+    settingsScreenSprite.setTexture(*settingsScreenTexture);
+    settingsScreenSprite.setScale(m_width / settingsScreenSprite.getLocalBounds().width, m_height / settingsScreenSprite.getLocalBounds().height);
 
     populateGrid();
 }
@@ -240,7 +246,7 @@ void Gameplay::handleInput()
         sf::Event event;
         while(m_window->pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)    // Close window button clicked.
+            if (event.type == sf::Event::Closed)
             {
                 m_window->close();
             }
@@ -279,7 +285,7 @@ void Gameplay::handleInput()
     }
     else if (m_screenName == "settings_screen")
     {
-
+        settingsScreenInput();
     }
 }
 
@@ -326,7 +332,7 @@ void Gameplay::render()
     }
     else if (m_screenName == "settings_screen")
     {
-
+        m_window->draw(settingsScreenSprite);
     }
 }
 
@@ -473,7 +479,6 @@ void Gameplay::renderGrid()
         }
     }
 }
-
 
 /**
  * @brief
@@ -659,10 +664,30 @@ void Gameplay::pausedScreenInput()
     }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::settingsScreenInput()
+{
+    sf::Event event;
+    while(m_window->pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
+            std::cout << "big red x";
+            m_window->close();
+        }
+    }
+}
+
 void Gameplay::calculatePlayerVelocity()
 {
-    float x_distance = m_squareToMoveTo.getPosition().x + 0.5*squareSize - player.x;
-    float y_distance = m_squareToMoveTo.getPosition().y + 0.5*squareSize - player.y;
+    float x_distance = m_squareToMoveTo.getPosition().x + 0.5 * squareSize - player.x;
+    float y_distance = m_squareToMoveTo.getPosition().y + 0.5 * squareSize - player.y;
     float total_distance = std::abs(x_distance) + std::abs(y_distance);
     
     if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 1)
@@ -672,7 +697,29 @@ void Gameplay::calculatePlayerVelocity()
         return;
     }
 
-    player.velocity.x = (-50 * x_distance / total_distance)/m_settings->frameRate;
-    player.velocity.y = (-50 * y_distance / total_distance)/m_settings->frameRate;
+    player.velocity.x = (-50 * x_distance / total_distance) / m_settings->frameRate;
+    player.velocity.y = (-50 * y_distance / total_distance) / m_settings->frameRate;
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::updateSettingsStruct()
+{
+    std::fstream file("user_data/settings.csv", std::ios::out);
+    const char comma = ',';
+    file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
+    file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
+    file << "DIFFICULTY, " << m_settings->difficulty << '\n';
+    file << "FRAME_RATE, " << m_settings->frameRate << '\n';
+    file << "SHOW_FPS, "   << m_settings->showFps << '\n';
+    file << "SAVESLOT_1, " << m_settings->saveSlot1 << '\n';
+    file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
+    file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
+    m_window->setFramerateLimit(m_settings->frameRate);
+    file.close();
+}

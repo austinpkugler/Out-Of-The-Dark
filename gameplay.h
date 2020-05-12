@@ -48,40 +48,37 @@ private:
     void populateGrid();
     void renderGrid();
     void pausedScreenInput();
+    void settingsScreenInput();
     void calculatePlayerVelocity();
     bool playerWon();
     void resetLevel();
+    void updateSettingsStruct();
     const GameObject blockMouseIsOn() const;
     std::vector<GameObject> blocksPlayerIsOn() const;
-
-
-    sf::Vector2f indexToCoord(unsigned int x, unsigned int y) const;
-
-
 
     sf::RectangleShape healthBar;
     sf::RectangleShape healthBarBg;
     sf::RectangleShape m_highlightedGridRect; // square where mouse is highlighted
     sf::RectangleShape m_squareToMoveTo;      // square to move to 
-
     sf::Texture* deathScreenTexture;
     sf::Sprite deathScreenSprite;
     sf::Texture* hardModeTexture;
     sf::Sprite hardModeSprite;
     sf::Texture* pausedScreenTexture;
     sf::Sprite pausedScreenSprite;
-
-    std::vector<sf::Texture*> vectorOfTextures;
-    std::vector<std::vector<GameObject>> m_maze;
+    sf::Texture* settingsScreenTexture;
+    sf::Sprite settingsScreenSprite;
     sf::Vector2i upperLeftSquare;
     sf::Vector2i startingBlock;
+    sf::Vector2f indexToCoord(unsigned int x, unsigned int y) const;
+    sf::Vector2f gridOffset;
+    std::vector<sf::Texture*> vectorOfTextures;
+
+    std::vector<std::vector<GameObject>> m_maze;
+    std::string fileName;
     unsigned int objectsToDisplay;
     float squareSize;
     float TEXTURE_SIZE;
     unsigned int GRID_SIZE;
-    sf::Vector2f gridOffset;
-
-    std::string fileName;
-
     Player player;
 };
