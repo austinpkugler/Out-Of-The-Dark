@@ -1,0 +1,8 @@
+TODO:
+	make settings from inside game
+	make instructions
+	add docs
+	make damage work
+	make collision work
+
+	currently the collision check for the player is wrong ):

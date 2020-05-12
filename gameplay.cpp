@@ -1,5 +1,11 @@
 #include "gameplay.h"
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ */
 Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, float height, std::string fileName, int saveSlot)
 {
     m_window = window;
@@ -8,9 +14,15 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
     m_height = height;
     objectsToDisplay = 25; // draw 25 squares on a screen
     TEXTURE_SIZE = 250.0f; // size of square in pixels
+    gridOffset.x = 0;
+    gridOffset.y = 0;
+    player.velocity.x = 0;
+    player.velocity.y = 0;
+    m_screenName = "game_screen";
 
     deathScreenTexture = new sf::Texture();
     hardModeTexture = new sf::Texture();
+    pausedScreenTexture = new sf::Texture();
     
     if (saveSlot == 1)
     {
@@ -46,8 +58,8 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
     std::cout << startingBlock.x << " " << startingBlock.y << '\n';
     
     sf::Vector2f playerCoords = indexToCoord(startingBlock.x, startingBlock.y);
-    player.x = playerCoords.x + 0.5*squareSize;
-    player.y = playerCoords.y + 0.5*squareSize;
+    player.x = playerCoords.x + 0.5 * squareSize - gridOffset.x;
+    player.y = playerCoords.y + 0.5 * squareSize - gridOffset.y;
     player.sprite.setPosition(player.x, player.y);
 
     m_highlightedGridRect.setSize(sf::Vector2f(squareSize, squareSize));
@@ -59,10 +71,23 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, fl
 
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ */
 Gameplay::~Gameplay()
 {
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::load()
 {
     for (int i = 0; i < 8; i++)
@@ -72,50 +97,66 @@ void Gameplay::load()
 
     if (!vectorOfTextures[0]->loadFromFile("assets/blue_floor_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'blue_floor_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[1]->loadFromFile("assets/blue_floor_trapped_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'blue_floor_trapped_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[2]->loadFromFile("assets/blue_floor_fire_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'blue_floor_fire_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[3]->loadFromFile("assets/death_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'death_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[4]->loadFromFile("assets/wall_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'wall_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[5]->loadFromFile("assets/alien_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'alien_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[6]->loadFromFile("assets/start_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'start_texture.png'\n";
         std::exit(1);
     }
     if (!vectorOfTextures[7]->loadFromFile("assets/end_texture.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'end_texture.png'\n";
         std::exit(1);
     }
     if (!player.texturePtr->loadFromFile("assets/player.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'player.png'\n";
         std::exit(1);
     }
     if (!deathScreenTexture->loadFromFile("assets/death_background.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'death_background.png'\n";
         std::exit(1);
     }
     if (!hardModeTexture->loadFromFile("assets/hard_mode_background.png"))
     {
+        std::cout << "Gameplay: Failed to load asset 'hard_mode_background.png'\n";
+        std::exit(1);
+    }
+    if (!pausedScreenTexture->loadFromFile("assets/settings_screen_overlay_background.png"))
+    {
+        std::cout << "Gameplay: Failed to load asset 'settings_screen_overlay_background.png'\n";
         std::exit(1);
     }
     player.sprite.setTexture(*player.texturePtr);
-    player.sprite.setScale((squareSize / 240.0f) * 0.7, (squareSize / 240.0f) * 0.7);
+    player.sprite.setScale((squareSize / 240.0f) * 0.5, (squareSize / 240.0f) * 0.5);
     player.sprite.setOrigin(player.sprite.getLocalBounds().width/2, 
                             player.sprite.getLocalBounds().height/2);
 
@@ -127,107 +168,196 @@ void Gameplay::load()
     hardModeSprite.setScale(m_width / hardModeSprite.getLocalBounds().width,
                                 m_height / hardModeSprite.getLocalBounds().height);
 
+    pausedScreenSprite.setTexture(*pausedScreenTexture);
+    pausedScreenSprite.setScale(m_width / pausedScreenSprite.getLocalBounds().width,
+                                m_height / pausedScreenSprite.getLocalBounds().height);
+
     populateGrid();
-    // std::cout << "load() is finished\n";
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::update()
 {
-    GameObject blockMouseOn = blockMouseIsOn();
-    // std::cout << "update is called\n";
-    applyDamage();
-    if (playerWon())
+    if (m_screenName == "game_screen")
     {
-        std::cout << "player won!\n";
-        std::exit(1);
-    }
+        calculatePlayerVelocity();
+        GameObject blockMouseOn = blockMouseIsOn();
+        applyDamage();
+        if (playerWon())
+        {
+            std::cout << "player won!\n";
+        }
 
-    if (blockMouseOn.arrIndexX != -1)
-    {
-        m_highlightedGridRect.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x)*squareSize,
-                                          (blockMouseOn.arrIndexY - upperLeftSquare.y)*squareSize);
+        m_squareToMoveTo.move(player.velocity.x, player.velocity.y);
+        // std::cout << (blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x << '\n';
+        if (blockMouseOn.arrIndexX != -1)
+        {
+            m_highlightedGridRect.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
+                                            (blockMouseOn.arrIndexY - upperLeftSquare.y)*squareSize + gridOffset.y);
+                                            
+        }
+        if (gridOffset.x >= squareSize)
+        {
+            gridOffset.x -= squareSize;
+            --upperLeftSquare.x;
+        }
+        if (gridOffset.x <= -1*squareSize)
+        {
+            gridOffset.x += squareSize;
+            ++upperLeftSquare.x;
+        }
+        if (gridOffset.y >= squareSize)
+        {
+            gridOffset.y -= squareSize;
+            --upperLeftSquare.y;
+        }
+        if (gridOffset.y <= -1*squareSize)
+        {
+            gridOffset.y += squareSize;
+            ++upperLeftSquare.y;
+        }
+        gridOffset.x += player.velocity.x;
+        gridOffset.y += player.velocity.y;
     }
-    // std::cout << "update is finished\n";
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::handleInput()
 {
-    // std::cout << "handleInput is called\n";
-    sf::Event event;
-    while(m_window->pollEvent(event))
+    if (m_screenName == "game_screen")
     {
-        if (event.type == sf::Event::Closed)    // Close window button clicked.
+        sf::Event event;
+        while(m_window->pollEvent(event))
         {
-            m_window->close();
-        }
-         if (event.type == sf::Event::MouseButtonPressed)
-        {
-            if (event.mouseButton.button == sf::Mouse::Left)
+            if (event.type == sf::Event::Closed)    // Close window button clicked.
             {
-                if (player.alive)
+                m_window->close();
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    GameObject blockMouseOn = blockMouseIsOn();
-                    if (blockMouseOn.arrIndexX != -1)
+                    if (player.alive)
                     {
-                        m_squareToMoveTo.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize,
-                                                     (blockMouseOn.arrIndexY - upperLeftSquare.y) * squareSize);
+                        GameObject blockMouseOn = blockMouseIsOn();
+                        if (blockMouseOn.arrIndexX != -1)
+                        {
+                            m_squareToMoveTo.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x,
+                                                        (blockMouseOn.arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
+                        }
+                    }
+                    else
+                    {
+                        player.alive = true;
+                        player.healthPercent = 100;
                     }
                 }
-                else
+            }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
                 {
-                    player.alive = true;
-                    player.healthPercent = 100;
+                    m_screenName = "paused_screen";
                 }
             }
         }
     }
+    else if (m_screenName == "paused_screen")
+    {
+        pausedScreenInput();
+    }
+    else if (m_screenName == "settings_screen")
+    {
+
+    }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::render()
 {
-    renderGrid();
-    if (player.alive)
+    if (m_screenName == "game_screen")
     {
-        if (m_squareToMoveTo.getPosition().x != -1)
+        renderGrid();
+        if (player.alive)
         {
-            m_window->draw(m_squareToMoveTo);
-        }
-        if (blockMouseIsOn().arrIndexX != -1)
-        {
-            m_window->draw(m_highlightedGridRect);
-        }
-        m_window->draw(player.sprite);
-        if (m_settings->difficulty = 0)
-        {
-            displayHealth();
+            if (m_squareToMoveTo.getPosition().x != -1)
+            {
+                m_window->draw(m_squareToMoveTo);
+            }
+            if (blockMouseIsOn().arrIndexX != -1)
+            {
+                m_window->draw(m_highlightedGridRect);
+            }
+            m_window->draw(player.sprite);
+            if (m_settings->difficulty == 0)
+            {
+                displayHealth();
+            }
+            else
+            {
+                m_window->draw(hardModeSprite);
+            }
         }
         else
         {
-            m_window->draw(hardModeSprite);
+            m_window->draw(deathScreenSprite);
         }
     }
-    else
+    else if (m_screenName == "paused_screen")
     {
-        m_window->draw(deathScreenSprite);
+        m_window->draw(pausedScreenSprite);
+    }
+    else if (m_screenName == "settings_screen")
+    {
+
     }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::displayHealth()
 {
     healthBar.setSize(sf::Vector2f((player.healthPercent * 0.15) / 100 * m_width, 0.01 * m_height));
-
-    // std::cout << (m_height* 0.05) << " playery health\n";
-    
     m_window->draw(healthBarBg);
     m_window->draw(healthBar);
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::applyDamage()
 {
     // std::cout << "applyDamage is called\n";
     std::vector<GameObject> objectsStandingOn = blocksPlayerIsOn();
     // If the texture is a trap
-    for (int i=0; i < objectsStandingOn.size(); ++i)
+    for (int i = 0; i < objectsStandingOn.size(); ++i)
     {
         if (objectsStandingOn[i].textureIndex == 1)
         {
@@ -246,8 +376,7 @@ void Gameplay::applyDamage()
         {
             player.healthPercent -= 0.1;
         }
-    }
-
+    }   
     if (player.burning && player.burnLength % m_settings->frameRate == 0)
     {
         player.healthPercent -= 5;
@@ -261,7 +390,6 @@ void Gameplay::applyDamage()
     {
         player.burnLength++;
     }
-
     if (player.healthPercent <= 0)
     {
         player.healthPercent = 0;
@@ -271,9 +399,15 @@ void Gameplay::applyDamage()
     }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::populateGrid()
 {
-    // std::cout << "populateGrid() is called\n";
     std::fstream file(fileName, std::ios::in);
     file >> GRID_SIZE;
     for (int x = 0; x < GRID_SIZE; ++x)
@@ -284,7 +418,7 @@ void Gameplay::populateGrid()
             m_maze[x].push_back(GameObject());
             m_maze[x][y].arrIndexX = x;
             m_maze[x][y].arrIndexY = y;
-            m_maze[x][y].sprite.setScale(squareSize/TEXTURE_SIZE, squareSize/TEXTURE_SIZE);
+            m_maze[x][y].sprite.setScale(squareSize / TEXTURE_SIZE, squareSize / TEXTURE_SIZE);
             file >> m_maze[x][y].textureIndex;
 
             m_maze[x][y].sprite.setTexture(*vectorOfTextures[m_maze[x][y].textureIndex]);
@@ -300,18 +434,18 @@ void Gameplay::populateGrid()
                 case 3:     // If the texture is a bloodied path
                     m_maze[x][y].walkable = 1;
                     break;
-                case 4:     // if the texture ise a stone wall
+                case 4:     // Ff the texture ise a stone wall
                     m_maze[x][y].walkable = 0;
                     break;
-                case 5:    // if the texture is diseased path
+                case 5:     // If the texture is diseased path
                     m_maze[x][y].walkable = 1;
                     break;
-                case 6:    // if the texture is maze start
+                case 6:     // If the texture is maze start
                     m_maze[x][y].walkable = 1;
                     startingBlock.x = m_maze[x][y].arrIndexX;
                     startingBlock.y = m_maze[x][y].arrIndexY;
                     break;
-                case 7:   // if the texture is maze end
+                case 7:     // If the texture is maze end
                     m_maze[x][y].walkable = 1;
                     break;
             };
@@ -320,23 +454,49 @@ void Gameplay::populateGrid()
     file.close();
 }
 
-
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::renderGrid()
 {
-    // std::cout << "rendergrid called\n";
 
-    for (int arr_x = upperLeftSquare.x; arr_x < (upperLeftSquare.x + objectsToDisplay); ++arr_x)
+    for (int arr_x = upperLeftSquare.x - 2; arr_x < (upperLeftSquare.x + objectsToDisplay) + 4; ++arr_x)
     {
-        for (int arr_y = upperLeftSquare.y; arr_y < (upperLeftSquare.y + objectsToDisplay); ++arr_y)
+        for (int arr_y = upperLeftSquare.y - 2; arr_y < (upperLeftSquare.y + objectsToDisplay) + 4; ++arr_y)
         {
-            float x_coords = (m_maze[arr_x][arr_y].arrIndexX - upperLeftSquare.x) * squareSize;
-            float y_coords = (m_maze[arr_x][arr_y].arrIndexY - upperLeftSquare.y) * squareSize;
+            float x_coords = ((m_maze[arr_x][arr_y].arrIndexX - upperLeftSquare.x + 2) * squareSize) - 2*squareSize;
+            float y_coords = ((m_maze[arr_x][arr_y].arrIndexY - upperLeftSquare.y + 2) * squareSize) - 2*squareSize;
+            x_coords += gridOffset.x;
+            y_coords += gridOffset.y;
             m_maze[arr_x][arr_y].sprite.setPosition(x_coords, y_coords);
             m_window->draw(m_maze[arr_x][arr_y].sprite);
         }
     }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::renderSettings()
+{
+
+}
+
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 bool Gameplay::playerWon()
 {
     std::vector<GameObject> objectsStandingOn = blocksPlayerIsOn();
@@ -348,9 +508,15 @@ bool Gameplay::playerWon()
             }
     }
     return false;
-
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 const GameObject Gameplay::blockMouseIsOn() const
 {
     float mouseX = sf::Mouse::getPosition(*m_window).x;
@@ -359,9 +525,8 @@ const GameObject Gameplay::blockMouseIsOn() const
     mouseY /= m_window->getSize().y;
     mouseX *= m_width;
     mouseY *= m_height;
-    int x = (mouseX / squareSize) + upperLeftSquare.x;
-    int y = (mouseY / squareSize) + upperLeftSquare.y;
-
+    int x = ((mouseX - gridOffset.x)/ squareSize) + upperLeftSquare.x;
+    int y = ((mouseY - gridOffset.y) / squareSize) + upperLeftSquare.y;
     if (x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)
     {
         return GameObject();
@@ -369,12 +534,25 @@ const GameObject Gameplay::blockMouseIsOn() const
     return m_maze[x][y];
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 {
-    return sf::Vector2f((x - upperLeftSquare.x) * squareSize, (y - upperLeftSquare.y) * squareSize);
+    return sf::Vector2f((x - upperLeftSquare.x) * squareSize + gridOffset.x, (y - upperLeftSquare.y) * squareSize + gridOffset.y);
 }
 
-
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 {
     std::vector<GameObject> blocks;
@@ -387,15 +565,15 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
     }
 
     if (!(x-1 >= GRID_SIZE || x-1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
-    {
-        if (player.x - 0.5*player.sprite.getLocalBounds().width < indexToCoord(x, y).x)
+    { 
+        if (player.x - 0.5*player.sprite.getLocalBounds().width < indexToCoord(x, y).x + squareSize)
         {
             blocks.push_back(m_maze[x-1][y]);
         }
     }
     if (!(x+1 >= GRID_SIZE || x+1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
     {
-        if (player.x - 0.5*player.sprite.getLocalBounds().width > indexToCoord(x+1, y).x)
+        if (player.x + 0.5*player.sprite.getLocalBounds().width > indexToCoord(x+1, y).x)
         {
             blocks.push_back(m_maze[x+1][y]);
         }
@@ -409,11 +587,88 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
     }
     if (!(x >= GRID_SIZE || x < 0 || y+1 >= GRID_SIZE || y+1 < 0)) // if not out of bounds
     {
-        if (player.y - 0.5*player.sprite.getLocalBounds().height > indexToCoord(x, y+1).y)
+        if (player.y + 0.5*player.sprite.getLocalBounds().height > indexToCoord(x, y+1).y)
         {
             blocks.push_back(m_maze[x-1][y+1]);
         }
     }
-    
+    for (int i=0; i < blocks.size(); ++i)
+    {
+        std::cout << blocks[i].textureIndex << ' ';
+    }
+    std::cout << "\n";
     return blocks;
 }
+
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::pausedScreenInput()
+{
+    float width = m_window->getSize().x;
+    float height = m_window->getSize().y;
+    sf::Event event;
+    while(m_window->pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
+            m_window->close();
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                if (event.mouseButton.x >= width * 0.10 &&
+                    event.mouseButton.x <= width * 0.28)
+                {
+                    if (event.mouseButton.y >= height * 0.25 &&
+                        event.mouseButton.y <= height * 0.30)
+                    {
+                        std::cout << "Gameplay: 'Back To Game' button pressed\n";
+                        m_screenName = "game_screen";
+                    }
+                    else if (event.mouseButton.y >= height * 0.35 &&
+                             event.mouseButton.y <= height * 0.40)
+                    {
+                        std::cout << "Gameplay: 'Main Menu' button pressed\n";
+                        m_sectionName = "menu";
+                    }
+                    else if (event.mouseButton.y >= height * 0.45 &&
+                             event.mouseButton.y <= height * 0.50)
+                    {
+                        std::cout << "Gameplay: 'Settings' button pressed\n";
+                        m_screenName = "settings_screen";
+                    }
+                    // else if (event.mouseButton.y >= height * 0.55 &&
+                    //          event.mouseButton.y <= height * 0.60)
+                    // {
+                    //     std::cout << "Menu: 'Quit' button pressed\n";
+                    //     m_window->close();
+                    // }
+                }
+            }
+        }
+    }
+}
+
+void Gameplay::calculatePlayerVelocity()
+{
+    float x_distance = m_squareToMoveTo.getPosition().x + 0.5*squareSize - player.x;
+    float y_distance = m_squareToMoveTo.getPosition().y + 0.5*squareSize - player.y;
+    float total_distance = std::abs(x_distance) + std::abs(y_distance);
+    
+    if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 1)
+    {
+        player.velocity.x = 0;
+        player.velocity.y = 0;
+        return;
+    }
+
+    player.velocity.x = (-50 * x_distance / total_distance)/m_settings->frameRate;
+    player.velocity.y = (-50 * y_distance / total_distance)/m_settings->frameRate;
+}
+

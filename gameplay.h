@@ -6,6 +6,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
+#include <cstdlib>
 
 struct Player
 {
@@ -13,10 +14,11 @@ struct Player
     bool burning = false;
     float healthPercent = 100;
     unsigned int burnLength = 0;
-    unsigned int x; // in terms of pixels
-    unsigned int y; // in terms of pixels
+    unsigned int x = 0; // in terms of pixels
+    unsigned int y = 0; // in terms of pixels
     sf::Sprite sprite;
     sf::Texture* texturePtr = new sf::Texture();
+    sf::Vector2f velocity = sf::Vector2f(0, 0);
 
 };
 
@@ -45,8 +47,10 @@ private:
     void applyDamage();
     void populateGrid();
     void renderGrid();
+    void pausedScreenInput();
+    void calculatePlayerVelocity();
     bool playerWon();
-
+    void renderSettings();
     const GameObject blockMouseIsOn() const;
     std::vector<GameObject> blocksPlayerIsOn() const;
 
@@ -64,6 +68,8 @@ private:
     sf::Sprite deathScreenSprite;
     sf::Texture* hardModeTexture;
     sf::Sprite hardModeSprite;
+    sf::Texture* pausedScreenTexture;
+    sf::Sprite pausedScreenSprite;
 
     std::vector<sf::Texture*> vectorOfTextures;
     std::vector<std::vector<GameObject>> m_maze;
@@ -73,6 +79,7 @@ private:
     float squareSize;
     float TEXTURE_SIZE;
     unsigned int GRID_SIZE;
+    sf::Vector2f gridOffset;
 
     std::string fileName;
 

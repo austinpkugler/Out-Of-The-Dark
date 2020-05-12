@@ -48,18 +48,17 @@ void Game::load()
     loadSettingsStruct();
     if (!m_soundBuffer.loadFromFile("assets/clicked.wav"))
     {
-        std::cout << "FATAL ERROR: Failed to load asset clicked.wav\n";
+        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
         std::exit(1);
     }
     if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
     {
-        std::cout << "FATAL ERROR: Failed to load asset rm_typerighter.ttf\n";
+        std::cout << "Game: Failed to load asset 'rm_typerighter.ttf'\n";
         std::exit(1);
     }
-    std::cout << "Playing music\n";
     if (!m_music->openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
     {
-        std::cout << "FATAL ERROR: Failed to load asset 2nd_Sonata_Malign_Chords.ogg\n";
+        std::cout << "Game: Failed to load asset '2nd_Sonata_Malign_Chords.ogg'\n";
         std::exit(1);
     }
     m_music->setVolume(20.f);
@@ -216,7 +215,6 @@ void Game::playSoundBuffer()
         sf::Sound sound;
         sound.setBuffer(m_soundBuffer);
         sound.play();
-        std::cout << "Audio: Playing sound effect from buffer\n";
     }
 }
 
@@ -243,7 +241,7 @@ bool Game::isDone() const
 void Game::loadSettingsStruct()
 {
     std::fstream file("user_data/settings.csv", std::ios::in);
-    char comma = ',';
+    char space;
     std::string parameterName;
 
     file >> parameterName >> m_settings->playMusic;
@@ -252,13 +250,14 @@ void Game::loadSettingsStruct()
     file >> parameterName >> m_settings->frameRate;
     file >> parameterName >> m_settings->showFps;
     file >> parameterName;
+    file.get(space);
     getline(file, m_settings->saveSlot1);
     file >> parameterName;
+    file.get(space);
     getline(file, m_settings->saveSlot2);
     file >> parameterName;
+    file.get(space);
     getline(file, m_settings->saveSlot3);
-
-    std::cout << "struct2 " << m_settings->saveSlot2; 
 
     file.close();
 }
