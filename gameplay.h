@@ -9,11 +9,15 @@
 
 struct Player
 {
-    float healthPercent = 100;
+    bool alive = true;
     bool burning = false;
+    float healthPercent = 100;
     unsigned int burnLength = 0;
     unsigned int x; // in terms of pixels
     unsigned int y; // in terms of pixels
+    sf::Sprite sprite;
+    sf::Texture* texturePtr = new sf::Texture();
+
 };
 
 struct GameObject
@@ -43,16 +47,23 @@ private:
     void renderGrid();
     bool playerWon();
 
-    const GameObject blockPlayerIsOn() const;
     const GameObject blockMouseIsOn() const;
+    std::vector<GameObject> blocksPlayerIsOn() const;
+
+
+    sf::Vector2f indexToCoord(unsigned int x, unsigned int y) const;
 
 
 
     sf::RectangleShape healthBar;
     sf::RectangleShape healthBarBg;
     sf::RectangleShape m_highlightedGridRect; // square where mouse is highlighted
-    sf::Sprite m_backgroundSprite;
-    sf::Texture* m_backgroundTexture;
+    sf::RectangleShape m_squareToMoveTo;      // square to move to 
+
+    sf::Texture* deathScreenTexture;
+    sf::Sprite deathScreenSprite;
+    sf::Texture* hardModeTexture;
+    sf::Sprite hardModeSprite;
 
     std::vector<sf::Texture*> vectorOfTextures;
     std::vector<std::vector<GameObject>> m_maze;

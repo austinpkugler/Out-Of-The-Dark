@@ -56,19 +56,19 @@ void Game::load()
         std::cout << "FATAL ERROR: Failed to load asset rm_typerighter.ttf\n";
         std::exit(1);
     }
+    std::cout << "Playing music\n";
+    if (!m_music->openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
+    {
+        std::cout << "FATAL ERROR: Failed to load asset 2nd_Sonata_Malign_Chords.ogg\n";
+        std::exit(1);
+    }
+    m_music->setVolume(20.f);
+    m_music->setLoop(true);
+
     if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
     {
-        std::cout << "Playing music\n";
-        if (!m_music->openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
-        {
-            std::cout << "FATAL ERROR: Failed to load asset 2nd_Sonata_Malign_Chords.ogg\n";
-            std::exit(1);
-        }
-        m_music->setVolume(20.f);
-        m_music->setLoop(true);
         m_music->play();
     }
-
 }
 
 /**
