@@ -402,6 +402,15 @@ void Menu::playScreenInput()
                 }
             }
         }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                updateSettingsStruct();
+                m_screenName = "title_screen";
+                load();
+            }
+        }
     }
 }
 
@@ -518,6 +527,15 @@ void Menu::settingsScreenInput()
                         load();
                     }
                 }
+            }
+        }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                updateSettingsStruct();
+                m_screenName = "title_screen";
+                load();
             }
         }
     }

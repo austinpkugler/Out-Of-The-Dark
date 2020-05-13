@@ -333,6 +333,7 @@ void Gameplay::render()
     else if (m_screenName == "settings_screen")
     {
         m_window->draw(settingsScreenSprite);
+        renderSettingsScreen();
     }
 }
 
@@ -652,13 +653,14 @@ void Gameplay::pausedScreenInput()
                         std::cout << "Gameplay: 'Settings' button pressed\n";
                         m_screenName = "settings_screen";
                     }
-                    // else if (event.mouseButton.y >= height * 0.55 &&
-                    //          event.mouseButton.y <= height * 0.60)
-                    // {
-                    //     std::cout << "Menu: 'Quit' button pressed\n";
-                    //     m_window->close();
-                    // }
                 }
+            }
+        }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                m_screenName = "game_screen";
             }
         }
     }
@@ -678,12 +680,194 @@ void Gameplay::settingsScreenInput()
     {
         if (event.type == sf::Event::Closed)
         {
-            std::cout << "big red x";
             m_window->close();
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                if (event.mouseButton.x >= m_width * 0.30 &&
+                    event.mouseButton.x <= m_width * 0.37)
+                {
+                    if (event.mouseButton.y >= m_height * 0.25 &&
+                        event.mouseButton.y <= m_height * 0.30)
+                    {
+                        std::cout << "Gameplay: Play Music 'Yes' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.35 &&
+                             event.mouseButton.y <= m_height * 0.40)
+                    {
+                        std::cout << "Gameplay: Play Audio 'Yes' button pressed\n";
+                        m_settings->playAudio = true;
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.45 &&
+                             event.mouseButton.y <= m_height * 0.50)
+                    {
+                        std::cout << "Gameplay: Difficulty 'Easy' button pressed\n";
+                        m_settings->difficulty = 0;
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.55 &&
+                             event.mouseButton.y <= m_height * 0.60)
+                    {
+                        std::cout << "Gameplay: FPS '30' button pressed\n";
+                        m_settings->frameRate = 30;
+                        m_window->setFramerateLimit(m_settings->frameRate);
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.65 &&
+                             event.mouseButton.y <= m_height * 0.70)
+                    {
+                        std::cout << "Gameplay: Show FPS 'Yes' button pressed\n";
+                        m_settings->showFps = false;
+                    }
+                }
+                else if (event.mouseButton.x >= m_width * 0.40 &&
+                         event.mouseButton.x <= m_width * 0.48)
+                {
+                    if (event.mouseButton.y >=m_height * 0.25 &&
+                        event.mouseButton.y <=m_height * 0.30)
+                    {
+                        std::cout << "Gameplay: Play Music 'No' button pressed\n";
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.35 &&
+                             event.mouseButton.y <= m_height * 0.40)
+                    {
+                        std::cout << "Gameplay: Play Audio 'No' button pressed\n";
+                        m_settings->playAudio = true;
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.45 &&
+                             event.mouseButton.y <= m_height * 0.50)
+                    {
+                        std::cout << "Gameplay: Difficulty 'Hard' button pressed\n";
+                        m_settings->difficulty = 1;
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.55 &&
+                             event.mouseButton.y <= m_height * 0.60)
+                    {
+                        std::cout << "Gameplay: FPS '60' button pressed\n";
+                        m_settings->frameRate = 60;
+                        m_window->setFramerateLimit(m_settings->frameRate);
+                    }
+                    else if (event.mouseButton.y >= m_height * 0.65 &&
+                             event.mouseButton.y <= m_height * 0.70)
+                    {
+                        std::cout << "Gameplay: Show FPS 'No' button pressed\n";
+                        m_settings->showFps = false;
+                    }
+                }
+                else if (event.mouseButton.x >= m_width * 0.50 &&
+                         event.mouseButton.x <= m_width * 0.56)
+                {
+                    if (event.mouseButton.y >= m_height * 0.55 &&
+                        event.mouseButton.y <= m_height * 0.6)
+                    {
+                        std::cout << "Gameplay: FPS '120' button pressed\n";
+                        m_settings->frameRate = 120;
+                        m_window->setFramerateLimit(m_settings->frameRate);
+                    }
+                }
+                else if (event.mouseButton.x >= m_width * 0.10 &&
+                         event.mouseButton.x <= m_width * 0.16)
+                {
+                    if (event.mouseButton.y >= m_height * 0.75 &&
+                        event.mouseButton.y <= m_height * 0.80)
+                    {
+                        updateSettingsStruct();
+                        m_screenName = "paused_screen";
+                    }
+                }
+            }
+        }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                m_screenName = "paused_screen";
+            }
         }
     }
 }
 
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
+void Gameplay::renderSettingsScreen()
+{
+    sf::RectangleShape rectangle(sf::Vector2f(m_width * 0.09, m_height * 0.05));
+    rectangle.setFillColor(sf::Color(0, 0, 0, 0));
+    rectangle.setOutlineColor(sf::Color(255, 255, 255));
+    rectangle.setOutlineThickness(2);
+    if (m_settings->playMusic)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.25);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.25);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings->playAudio)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.35);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.35);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings->difficulty)
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.45);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.45);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings->frameRate == 30)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+    else if (m_settings->frameRate == 60)
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+    else if (m_settings->frameRate == 120)
+    {
+        rectangle.setPosition(m_width * 0.5, m_height * 0.55);
+        m_window->draw(rectangle);
+    }
+
+    if (m_settings->showFps)
+    {
+        rectangle.setPosition(m_width * 0.3, m_height * 0.65);
+        m_window->draw(rectangle);
+    }
+    else
+    {
+        rectangle.setPosition(m_width * 0.4, m_height * 0.65);
+        m_window->draw(rectangle);
+    }
+}
+
+/**
+ * @brief
+ * @details
+ * @throw
+ * @param
+ * @return
+ */
 void Gameplay::calculatePlayerVelocity()
 {
     float x_distance = m_squareToMoveTo.getPosition().x + 0.5 * squareSize - player.x;

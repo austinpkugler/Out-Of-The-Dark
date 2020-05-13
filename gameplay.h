@@ -49,6 +49,7 @@ private:
     void renderGrid();
     void pausedScreenInput();
     void settingsScreenInput();
+    void renderSettingsScreen();
     void calculatePlayerVelocity();
     bool playerWon();
     void resetLevel();
