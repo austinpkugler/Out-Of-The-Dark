@@ -34,7 +34,7 @@ struct GameObject
 class Gameplay: public Section
 {
 public:
-    Gameplay(sf::RenderWindow* window, Settings* settings, float width, float height, std::string fileName, int saveSlot);
+    Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot);
     ~Gameplay();
 
     virtual void load();
@@ -74,6 +74,7 @@ private:
     sf::Vector2f indexToCoord(unsigned int x, unsigned int y) const;
     sf::Vector2f gridOffset;
     std::vector<sf::Texture*> vectorOfTextures;
+    sf::Music* m_music;
 
     std::vector<std::vector<GameObject>> m_maze;
     std::string fileName;

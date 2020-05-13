@@ -446,7 +446,6 @@ void Menu::settingsScreenInput()
                         if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
                         {
                             m_music->play();
-                            std::cout << "Game: Playing all music playback\n";
                         }
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
@@ -481,7 +480,6 @@ void Menu::settingsScreenInput()
                         if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
                         {
                             m_music->stop();
-                            std::cout << "Game: Stopped all music playback\n";
                         }
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&

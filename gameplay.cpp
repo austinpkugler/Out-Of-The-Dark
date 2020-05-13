@@ -6,10 +6,11 @@
  * @throw
  * @param
  */
-Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, float width, float height, std::string fileName, int saveSlot)
+Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot)
 {
     m_window = window;
     m_settings = settings;
+    m_music = music;
     m_width = width;
     m_height = height;
     objectsToDisplay = 25; // draw 25 squares on a screen
@@ -693,6 +694,11 @@ void Gameplay::settingsScreenInput()
                         event.mouseButton.y <= m_height * 0.30)
                     {
                         std::cout << "Gameplay: Play Music 'Yes' button pressed\n";
+                        m_settings->playMusic = true;
+                        if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
+                        {
+                            m_music->play();
+                        }
                     }
                     else if (event.mouseButton.y >= m_height * 0.35 &&
                              event.mouseButton.y <= m_height * 0.40)
@@ -727,6 +733,11 @@ void Gameplay::settingsScreenInput()
                         event.mouseButton.y <=m_height * 0.30)
                     {
                         std::cout << "Gameplay: Play Music 'No' button pressed\n";
+                        m_settings->playMusic = false;
+                        if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
+                        {
+                            m_music->stop();
+                        }
                     }
                     else if (event.mouseButton.y >= m_height * 0.35 &&
                              event.mouseButton.y <= m_height * 0.40)

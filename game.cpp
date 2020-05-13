@@ -111,15 +111,15 @@ void Game::update()
         }
         else if (m_sectionName == "save_slot_1")
         {
-            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot1, 1);
+            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot1, 1);
         }
         else if (m_sectionName == "save_slot_2")
         {
-            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot2, 2);
+            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot2, 2);
         }
         else if (m_sectionName == "save_slot_3")
         {
-            m_section = new Gameplay(m_window, m_settings, m_width, m_height, m_settings->saveSlot3, 3);
+            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot3, 3);
         }
     }
 }
