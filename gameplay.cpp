@@ -420,7 +420,6 @@ void Gameplay::calculateCollision()
         else if (objectsStandingOn[i].textureIndex == 2) // player standing on fire
         {
             player.burning = true;
-            player.healthPercent;
         }
         // Else if texture is wall
         else if (objectsStandingOn[i].textureIndex == 4)
@@ -455,7 +454,7 @@ void Gameplay::calculateCollision()
         }
     }
 
-    if (player.burning == true && player.burnLength % m_settings->frameRate == 0)
+    if (player.burning && player.burnLength % m_settings->frameRate == 0)
     {
         player.healthPercent -= 5;
         if (m_settings->frameRate * 5 == player.burnLength)
@@ -468,6 +467,21 @@ void Gameplay::calculateCollision()
     {
         player.burnLength++;
     }
+
+    if (player.poisoned && player.poisonedLength % (m_settings->frameRate / 5) == 0)
+    {
+        player.healthPercent -= 1;
+        if (m_settings->frameRate == player.poisonedLength)
+        {
+            player.poisoned = false;
+            player.poisonedLength = 0;
+        }
+    }
+    if (player.poisoned)
+    {
+        player.poisonedLength++;
+    }
+
     if (player.healthPercent <= 0)
     {
         player.healthPercent = 0;

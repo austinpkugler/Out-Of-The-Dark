@@ -1,11 +1,11 @@
-TODO:
-	make instructions
-	add docs
-	make damage work
-	make collision work
-
-	currently the collision check for the player is wrong ):
-
-
-    click to restart breaks it sometimes
-    fire no burny
+bloodied path doesnt do anything (this is fine AHHH shoulda replaced with health square)
+Add message like 'arrow keys to move' on maze builder
+do play audio stuff?
+guide or instructions of some kind (include damage)
+poison damage is still tied to fps
+finish comments
+maybe have different songs
+add default levels
+mayhbe add burning overlay
+back on maze builder prompts user to save
+convert .py to exe see if it can work without python dependency (it should)
