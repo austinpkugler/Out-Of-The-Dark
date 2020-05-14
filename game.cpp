@@ -26,7 +26,6 @@ Game::Game(sf::RenderWindow* window)
  * @details Deletes the allocated memory for the m_settings and m_section
  * instances.
  * @throw None
- * @param None
  */
 Game::~Game()
 {
@@ -35,7 +34,7 @@ Game::~Game()
 }
 
 /**
- * @brief Manages the loading of all game assets.
+ * @brief Manages the loading of all Game assets.
  * @details Loads global assets and then calls specific load functions
  * based on the current game state.
  * @throw SFML exceptions are thrown when assets fail to load. The program may
@@ -68,20 +67,6 @@ void Game::load()
     {
         m_music->play();
     }
-}
-
-/**
- * @brief Manages all game input.
- * @details When an input event occurs handleInput() calls the input handler
- * function of the child section class that is relevant to the state of the game
- * at the time input was received.
- * @throw SFML exceptions may be thrown during fatal errors.
- * @param None
- * @return None
- */
-void Game::handleInput()
-{
-    m_section->handleInput();
 }
 
 /**
@@ -125,7 +110,21 @@ void Game::update()
 }
 
 /**
- * @brief Displays all game assets to the screen.
+ * @brief Manages all Game input.
+ * @details When an input event occurs handleInput() calls the input handler
+ * function of the child section class that is relevant to the state of the game
+ * at the time input was received.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
+ */
+void Game::handleInput()
+{
+    m_section->handleInput();
+}
+
+/**
+ * @brief Displays all Game assets to the screen.
  * @details The render function of the current section is called to display all
  * game assets (backgrounds, sprites, etc.). FPS is then displayed if display
  * FPS is true.
@@ -156,8 +155,6 @@ void Game::render()
     }
     m_frameCount++;
 }
-
-
 
 /**
  * @brief Clears the game screen of all assets.

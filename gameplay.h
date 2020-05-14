@@ -10,10 +10,12 @@
 
 struct Player
 {
-    bool alive = true;
+    std::string status = "alive";
     bool burning = false;
+    bool poisoned = false;
     float healthPercent = 100;
     unsigned int burnLength = 0;
+    unsigned int poisonedLength = 0;
     unsigned int x = 0; // in terms of pixels
     unsigned int y = 0; // in terms of pixels
     sf::Sprite sprite;
@@ -47,6 +49,7 @@ private:
     void applyDamage();
     void populateGrid();
     void renderGrid();
+    void calculateCollision();
     void pausedScreenInput();
     void settingsScreenInput();
     void renderSettingsScreen();
@@ -68,6 +71,8 @@ private:
     sf::Texture* pausedScreenTexture;
     sf::Sprite pausedScreenSprite;
     sf::Texture* settingsScreenTexture;
+    sf::Sprite winScreenSprite;
+    sf::Texture* winScreenTexture;
     sf::Sprite settingsScreenSprite;
     sf::Vector2i upperLeftSquare;
     sf::Vector2i startingBlock;

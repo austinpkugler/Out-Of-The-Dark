@@ -1,10 +1,23 @@
 #include "gameplay.h"
 
 /**
- * @brief
- * @details
- * @throw
- * @param
+ * @brief Gameplay class constructor
+ * @details Initializes the variables required for running ingame attributes,
+ * including the player and ingame graphics.
+ * @throw SFML exceptions may be thrown during fatal errors, especially if
+ * assets fail to load.
+ * @param window - a pointer to an instance of sf::RenderWindow. This is the
+ * base frame of the game.
+ * @param settings - a pointer to an instance of the Settings struct. It
+ * contains all user preferences in relation to the game.
+ * @param music - a pointer to an instance of sf::Music. It holds the music that
+ * is played throughout the game.
+ * @param width - a float containing the starting width of the game window.
+ * @param height - a float containing the starting height of the game window.
+ * @param fileName - a string filepath to the maze level that is currently being
+ * played.
+ * @param saveSlot - an integer that contains the current save slot being
+ * played between 1-3.
  */
 Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot)
 {
@@ -25,7 +38,8 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     hardModeTexture = new sf::Texture();
     pausedScreenTexture = new sf::Texture();
     settingsScreenTexture = new sf::Texture();
-    
+    winScreenTexture = new sf::Texture();
+
     if (saveSlot == 1)
     {
         m_sectionName = "save_slot_1";
@@ -56,9 +70,6 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     upperLeftSquare.x = startingBlock.x - (objectsToDisplay - 1) / 2.0f;
     upperLeftSquare.y = startingBlock.y - ((objectsToDisplay / m_width) * m_height-1) / 2.0f;
 
-    // std::cout << upperLeftSquare.x << " " << upperLeftSquare.y << '\n';
-    // std::cout << startingBlock.x << " " << startingBlock.y << '\n';
-    
     sf::Vector2f playerCoords = indexToCoord(startingBlock.x, startingBlock.y);
     player.x = playerCoords.x + 0.5 * squareSize - gridOffset.x;
     player.y = playerCoords.y + 0.5 * squareSize - gridOffset.y;
@@ -73,21 +84,33 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
+ * @brief Destructor for the Gameplay class.
+ * @details Deletes the allocated memory for all game textures.
+ * @throw None
  */
 Gameplay::~Gameplay()
 {
+    delete deathScreenTexture;
+    delete hardModeTexture;
+    delete pausedScreenTexture;
+    delete settingsScreenTexture;
+    delete winScreenTexture;
+    delete player.texturePtr;
+    for (int i = 0; i < 8; i++)
+    {
+        delete vectorOfTextures[i];
+    }
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Manages the loading of all Gameplay assets.
+ * @details Loads assets required for gameplay, including player sprite and
+ * grid textures.
+ * @throw SFML exceptions are thrown when assets fail to load. The program may
+ * terminate when fatal errors occur. This function is called from a master 
+ * load() function in the Game class.
+ * @param None
+ * @return None
  */
 void Gameplay::load()
 {
@@ -161,9 +184,14 @@ void Gameplay::load()
         std::cout << "Gameplay: Failed to load asset 'settings_screen_background.png'\n";
         std::exit(1);
     }
+    if (!winScreenTexture->loadFromFile("assets/win_background.png"))
+    {
+        std::cout << "Gameplay: Failed to load asset 'win_background.png'\n";
+        std::exit(1);
+    }
 
     player.sprite.setTexture(*player.texturePtr);
-    player.sprite.setScale((squareSize / 240.0f) * 0.5, (squareSize / 240.0f) * 0.5);
+    player.sprite.setScale((squareSize / 240.0f) * 0.7, (squareSize / 240.0f) * 0.7);
     player.sprite.setOrigin(player.sprite.getLocalBounds().width / 2, player.sprite.getLocalBounds().height / 2);
 
     deathScreenSprite.setTexture(*deathScreenTexture);
@@ -178,30 +206,37 @@ void Gameplay::load()
     settingsScreenSprite.setTexture(*settingsScreenTexture);
     settingsScreenSprite.setScale(m_width / settingsScreenSprite.getLocalBounds().width, m_height / settingsScreenSprite.getLocalBounds().height);
 
+    winScreenSprite.setTexture(*winScreenTexture);
+    winScreenSprite.setScale(m_width / winScreenSprite.getLocalBounds().width, m_height / winScreenSprite.getLocalBounds().height);
+
     populateGrid();
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Updates all gameplay variables based on events that occur.
+ * @details Handles checking for death, applying of damage, calculating new
+ * player posistions, and other graphical updates. This function is called from
+ * a master update() function in the Game class.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
  */
 void Gameplay::update()
 {
     if (m_screenName == "game_screen")
     {
         calculatePlayerVelocity();
-        GameObject blockMouseOn = blockMouseIsOn();
-        applyDamage();
+        calculateCollision();
+
         if (playerWon())
         {
-            std::cout << "player won!\n";
+            player.status = "won";
         }
 
+
         m_squareToMoveTo.move(player.velocity.x, player.velocity.y);
-        // std::cout << (blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x << '\n';
+
+        GameObject blockMouseOn = blockMouseIsOn();
         if (blockMouseOn.arrIndexX != -1)
         {
             m_highlightedGridRect.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
@@ -234,11 +269,14 @@ void Gameplay::update()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Manages Gameplay input during game playthrough.
+ * @details All input events are checked for and the proper function calls are
+ * made. This includes input related to player movement and ingame virtual
+ * button presses. This function is called from a master handleInput() function
+ * in the Game class.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
  */
 void Gameplay::handleInput()
 {
@@ -255,7 +293,7 @@ void Gameplay::handleInput()
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    if (player.alive)
+                    if (player.status == "alive")
                     {
                         GameObject blockMouseOn = blockMouseIsOn();
                         if (blockMouseOn.arrIndexX != -1)
@@ -264,10 +302,9 @@ void Gameplay::handleInput()
                                                         (blockMouseOn.arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
                         }
                     }
-                    else
+                    else if (player.status == "dead" || player.status == "won")
                     {
-                        player.alive = true;
-                        player.healthPercent = 100;
+                        resetLevel();
                     }
                 }
             }
@@ -291,18 +328,19 @@ void Gameplay::handleInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Displays all Gameplay assets to the screen.
+ * @details The player sprite, grid textures, and overlays are displayed. This
+ * function is called from a master render() function in the Game class.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
  */
 void Gameplay::render()
 {
     if (m_screenName == "game_screen")
     {
         renderGrid();
-        if (player.alive)
+        if (player.status == "alive")
         {
             if (m_squareToMoveTo.getPosition().x != -1)
             {
@@ -322,9 +360,13 @@ void Gameplay::render()
                 m_window->draw(hardModeSprite);
             }
         }
-        else
+        else if (player.status == "dead")
         {
             m_window->draw(deathScreenSprite);
+        }
+        else if (player.status == "won")
+        {
+            m_window->draw(winScreenSprite);
         }
     }
     else if (m_screenName == "paused_screen")
@@ -339,9 +381,11 @@ void Gameplay::render()
 }
 
 /**
- * @brief
- * @details
- * @throw
+ * @brief Graphically displays the player's health bar.
+ * @details A red background health bar is always present behind a green health
+ * bar. The red background health bar remains at 100% capactiy at all times,
+ * while the forward green healthbar decreases in length when damage is taken.
+ * @throw SFML exceptions may be thrown during fatal errors.
  * @param
  * @return
  */
@@ -359,9 +403,8 @@ void Gameplay::displayHealth()
  * @param
  * @return
  */
-void Gameplay::applyDamage()
+void Gameplay::calculateCollision()
 {
-    // std::cout << "applyDamage is called\n";
     std::vector<GameObject> objectsStandingOn = blocksPlayerIsOn();
     // If the texture is a trap
     for (int i = 0; i < objectsStandingOn.size(); ++i)
@@ -376,15 +419,43 @@ void Gameplay::applyDamage()
         // Else if the texture is fire
         else if (objectsStandingOn[i].textureIndex == 2) // player standing on fire
         {
-            player.burning == true;
+            player.burning = true;
+            player.healthPercent;
+        }
+        // Else if texture is wall
+        else if (objectsStandingOn[i].textureIndex == 4)
+        {
+            int player_x = ((player.x - gridOffset.x) / squareSize) + upperLeftSquare.x;
+            int player_y = ((player.y - gridOffset.y) / squareSize) + upperLeftSquare.y;
+            if (objectsStandingOn[i].arrIndexX == player_x-1 && player.velocity.x > 0)
+            {
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+            }
+            else if (objectsStandingOn[i].arrIndexX == player_x + 1 && player.velocity.x < 0)
+            {
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+            }
+            else if (objectsStandingOn[i].arrIndexY == player_y + 1 && player.velocity.y < 0)
+            {
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+            }
+            else if (objectsStandingOn[i].arrIndexY == player_y - 1 && player.velocity.y > 0)
+            {
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+            }
         }
         // Else if the texture is diseased path
         else if (objectsStandingOn[i].textureIndex == 5) // player standing on diseased path
         {
-            player.healthPercent -= 0.1;
+            player.poisoned = true;
         }
     }
-    if (player.burning && player.burnLength % m_settings->frameRate == 0)
+
+    if (player.burning == true && player.burnLength % m_settings->frameRate == 0)
     {
         player.healthPercent -= 5;
         if (m_settings->frameRate * 5 == player.burnLength)
@@ -399,7 +470,8 @@ void Gameplay::applyDamage()
     }
     if (player.healthPercent <= 0)
     {
-        resetLevel();
+        player.healthPercent = 0;
+        player.status = "dead";
     }
 }
 
@@ -459,8 +531,10 @@ void Gameplay::populateGrid()
 }
 
 /**
- * @brief
- * @details
+ * @brief 
+ * @details A pixel offset is used to move the entire grid of textures based on
+ * user inputs. Positioning is relative to the top left corner of the grid. If 
+ * an area outside of the exisitng level occurs, then 
  * @throw
  * @param
  * @return
@@ -483,11 +557,12 @@ void Gameplay::renderGrid()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Returns a boolean indicating whether the player has won.
+ * @details Checks the texture the player is standing on to determine if it is
+ * an end texture.
+ * @throw None
+ * @param None
+ * @return bool - true if the player has won, false if not
  */
 bool Gameplay::playerWon()
 {
@@ -503,30 +578,40 @@ bool Gameplay::playerWon()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Resets the level to its original form.
+ * @details Player position, all textures, and player variables are all reset
+ * to their initial values when the level was first ran.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::resetLevel()
 {
-    player.healthPercent = 0;
-    player.alive = false;
-    load();
-    sf::Vector2f playerCoords = indexToCoord(startingBlock.x, startingBlock.y);
-    player.x = playerCoords.x + 0.5 * squareSize - gridOffset.x;
-    player.y = playerCoords.y + 0.5 * squareSize - gridOffset.y;
-    player.sprite.setPosition(player.x, player.y);
+    gridOffset.x = 0;
+    gridOffset.y = 0;
+    player.velocity.x = 0;
+    player.velocity.y = 0;
+    player.burning = false;
+    player.burnLength = 0;
+    player.poisoned = false;
+    player.poisonedLength = 0;
+    upperLeftSquare.x = startingBlock.x - (objectsToDisplay - 1) / 2.0f;
+    upperLeftSquare.y = startingBlock.y - ((objectsToDisplay / m_width) * m_height-1) / 2.0f;
     m_squareToMoveTo.setPosition(-1, -1);
+
+    player.healthPercent = 100;
+    player.status = "alive";
+    populateGrid();
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Calculates and returns the grid data of the mouse position.
+ * @details Using the size of the game window and the coordinates of the mouse,
+ * the grid x and y indices of the hovered over square are used to return the
+ * GameObject of the grid square.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return m_maze[x][y] - an instance of the GameObject struct.
  */
 const GameObject Gameplay::blockMouseIsOn() const
 {
@@ -546,11 +631,13 @@ const GameObject Gameplay::blockMouseIsOn() const
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Converts indices of the grid array to an sf::Vector2f.
+ * @details Passed x and y indices are used to calculate their equivalent
+ * pixel positions on the game window.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param x - the x index of the maze grid to be converted
+ * @param y - the y index of the maze grid to be converted
+ * @return sf::Vector2f - the pixel conversion of the passed indices.
  */
 sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 {
@@ -567,8 +654,8 @@ sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 {
     std::vector<GameObject> blocks;
-    unsigned int x = (player.x / squareSize) + upperLeftSquare.x;
-    unsigned int y = (player.y / squareSize) + upperLeftSquare.y;
+    unsigned int x = ((player.x - gridOffset.x) / squareSize) + upperLeftSquare.x; // dont calculate offset
+    unsigned int y = ((player.y - gridOffset.y) / squareSize) + upperLeftSquare.y;
 
     if (!(x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
     {
@@ -577,37 +664,32 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 
     if (!(x-1 >= GRID_SIZE || x-1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
     { 
-        if (player.x - 0.5*player.sprite.getLocalBounds().width < indexToCoord(x, y).x + squareSize)
+        if (player.x - 0.5*player.sprite.getGlobalBounds().width < indexToCoord(x-1, y).x + squareSize)
         {
             blocks.push_back(m_maze[x-1][y]);
         }
     }
     if (!(x+1 >= GRID_SIZE || x+1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
     {
-        if (player.x + 0.5*player.sprite.getLocalBounds().width > indexToCoord(x+1, y).x)
+        if (player.x + 0.5*player.sprite.getGlobalBounds().width > indexToCoord(x+1, y).x)
         {
             blocks.push_back(m_maze[x+1][y]);
         }
     }
     if (!(x >= GRID_SIZE || x < 0 || y-1 >= GRID_SIZE || y-1 < 0)) // if not out of bounds
     {
-        if (player.y - 0.5*player.sprite.getLocalBounds().height < indexToCoord(x, y).y)
+        if (player.y - 0.5*player.sprite.getGlobalBounds().height < indexToCoord(x, y).y)
         {
             blocks.push_back(m_maze[x][y-1]);
         }
     }
     if (!(x >= GRID_SIZE || x < 0 || y+1 >= GRID_SIZE || y+1 < 0)) // if not out of bounds
     {
-        if (player.y + 0.5 * player.sprite.getLocalBounds().height > indexToCoord(x, y + 1).y)
+        if (player.y + 0.5 * player.sprite.getGlobalBounds().height > indexToCoord(x, y+1).y)
         {
-            blocks.push_back(m_maze[x-1][y+1]);
+            blocks.push_back(m_maze[x][y+1]);
         }
     }
-    for (int i=0; i < blocks.size(); ++i)
-    {
-        // std::cout << blocks[i].textureIndex << ' ';
-    }
-    // std::cout << "\n";
     return blocks;
 }
 
@@ -677,6 +759,8 @@ void Gameplay::pausedScreenInput()
 void Gameplay::settingsScreenInput()
 {
     sf::Event event;
+    float width = m_window->getSize().x;
+    float height = m_window->getSize().y;
     while(m_window->pollEvent(event))
     {
         if (event.type == sf::Event::Closed)
@@ -687,11 +771,11 @@ void Gameplay::settingsScreenInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                if (event.mouseButton.x >= m_width * 0.30 &&
-                    event.mouseButton.x <= m_width * 0.37)
+                if (event.mouseButton.x >= width * 0.30 &&
+                    event.mouseButton.x <= width * 0.37)
                 {
-                    if (event.mouseButton.y >= m_height * 0.25 &&
-                        event.mouseButton.y <= m_height * 0.30)
+                    if (event.mouseButton.y >= height * 0.25 &&
+                        event.mouseButton.y <= height * 0.30)
                     {
                         std::cout << "Gameplay: Play Music 'Yes' button pressed\n";
                         m_settings->playMusic = true;
@@ -700,37 +784,37 @@ void Gameplay::settingsScreenInput()
                             m_music->play();
                         }
                     }
-                    else if (event.mouseButton.y >= m_height * 0.35 &&
-                             event.mouseButton.y <= m_height * 0.40)
+                    else if (event.mouseButton.y >= height * 0.35 &&
+                             event.mouseButton.y <= height * 0.40)
                     {
                         std::cout << "Gameplay: Play Audio 'Yes' button pressed\n";
                         m_settings->playAudio = true;
                     }
-                    else if (event.mouseButton.y >= m_height * 0.45 &&
-                             event.mouseButton.y <= m_height * 0.50)
+                    else if (event.mouseButton.y >= height * 0.45 &&
+                             event.mouseButton.y <= height * 0.50)
                     {
                         std::cout << "Gameplay: Difficulty 'Easy' button pressed\n";
                         m_settings->difficulty = 0;
                     }
-                    else if (event.mouseButton.y >= m_height * 0.55 &&
-                             event.mouseButton.y <= m_height * 0.60)
+                    else if (event.mouseButton.y >= height * 0.55 &&
+                             event.mouseButton.y <= height * 0.60)
                     {
                         std::cout << "Gameplay: FPS '30' button pressed\n";
                         m_settings->frameRate = 30;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
-                    else if (event.mouseButton.y >= m_height * 0.65 &&
-                             event.mouseButton.y <= m_height * 0.70)
+                    else if (event.mouseButton.y >= height * 0.65 &&
+                             event.mouseButton.y <= height * 0.70)
                     {
                         std::cout << "Gameplay: Show FPS 'Yes' button pressed\n";
-                        m_settings->showFps = false;
+                        m_settings->showFps = true;
                     }
                 }
-                else if (event.mouseButton.x >= m_width * 0.40 &&
-                         event.mouseButton.x <= m_width * 0.48)
+                else if (event.mouseButton.x >= width * 0.40 &&
+                         event.mouseButton.x <= width * 0.48)
                 {
-                    if (event.mouseButton.y >=m_height * 0.25 &&
-                        event.mouseButton.y <=m_height * 0.30)
+                    if (event.mouseButton.y >=height * 0.25 &&
+                        event.mouseButton.y <=height * 0.30)
                     {
                         std::cout << "Gameplay: Play Music 'No' button pressed\n";
                         m_settings->playMusic = false;
@@ -739,48 +823,48 @@ void Gameplay::settingsScreenInput()
                             m_music->stop();
                         }
                     }
-                    else if (event.mouseButton.y >= m_height * 0.35 &&
-                             event.mouseButton.y <= m_height * 0.40)
+                    else if (event.mouseButton.y >= height * 0.35 &&
+                             event.mouseButton.y <= height * 0.40)
                     {
                         std::cout << "Gameplay: Play Audio 'No' button pressed\n";
-                        m_settings->playAudio = true;
+                        m_settings->playAudio = false;
                     }
-                    else if (event.mouseButton.y >= m_height * 0.45 &&
-                             event.mouseButton.y <= m_height * 0.50)
+                    else if (event.mouseButton.y >= height * 0.45 &&
+                             event.mouseButton.y <= height * 0.50)
                     {
                         std::cout << "Gameplay: Difficulty 'Hard' button pressed\n";
                         m_settings->difficulty = 1;
                     }
-                    else if (event.mouseButton.y >= m_height * 0.55 &&
-                             event.mouseButton.y <= m_height * 0.60)
+                    else if (event.mouseButton.y >= height * 0.55 &&
+                             event.mouseButton.y <= height * 0.60)
                     {
                         std::cout << "Gameplay: FPS '60' button pressed\n";
                         m_settings->frameRate = 60;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
-                    else if (event.mouseButton.y >= m_height * 0.65 &&
-                             event.mouseButton.y <= m_height * 0.70)
+                    else if (event.mouseButton.y >= height * 0.65 &&
+                             event.mouseButton.y <= height * 0.70)
                     {
                         std::cout << "Gameplay: Show FPS 'No' button pressed\n";
                         m_settings->showFps = false;
                     }
                 }
-                else if (event.mouseButton.x >= m_width * 0.50 &&
-                         event.mouseButton.x <= m_width * 0.56)
+                else if (event.mouseButton.x >= width * 0.50 &&
+                         event.mouseButton.x <= width * 0.56)
                 {
-                    if (event.mouseButton.y >= m_height * 0.55 &&
-                        event.mouseButton.y <= m_height * 0.6)
+                    if (event.mouseButton.y >= height * 0.55 &&
+                        event.mouseButton.y <= height * 0.6)
                     {
                         std::cout << "Gameplay: FPS '120' button pressed\n";
                         m_settings->frameRate = 120;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
                 }
-                else if (event.mouseButton.x >= m_width * 0.10 &&
-                         event.mouseButton.x <= m_width * 0.16)
+                else if (event.mouseButton.x >= width * 0.10 &&
+                         event.mouseButton.x <= width * 0.16)
                 {
-                    if (event.mouseButton.y >= m_height * 0.75 &&
-                        event.mouseButton.y <= m_height * 0.80)
+                    if (event.mouseButton.y >= height * 0.75 &&
+                        event.mouseButton.y <= height * 0.80)
                     {
                         updateSettingsStruct();
                         m_screenName = "paused_screen";
@@ -885,15 +969,15 @@ void Gameplay::calculatePlayerVelocity()
     float y_distance = m_squareToMoveTo.getPosition().y + 0.5 * squareSize - player.y;
     float total_distance = std::abs(x_distance) + std::abs(y_distance);
     
-    if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 1)
+    if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 2)
     {
         player.velocity.x = 0;
         player.velocity.y = 0;
         return;
     }
 
-    player.velocity.x = (-50 * x_distance / total_distance) / m_settings->frameRate;
-    player.velocity.y = (-50 * y_distance / total_distance) / m_settings->frameRate;
+    player.velocity.x = (-75 * x_distance / total_distance) / m_settings->frameRate;
+    player.velocity.y = (-75 * y_distance / total_distance) / m_settings->frameRate;
 }
 
 /**
