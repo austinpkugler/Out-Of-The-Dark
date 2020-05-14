@@ -545,20 +545,21 @@ void Gameplay::populateGrid()
 }
 
 /**
- * @brief 
- * @details A pixel offset is used to move the entire grid of textures based on
- * user inputs. Positioning is relative to the top left corner of the grid. If 
- * an area outside of the exisitng level occurs, then 
- * @throw
- * @param
- * @return
+ * @brief renders the maze, including a layer of blocks the user cannot see around the screen
+ * @details loops through upper left corner of the maze - 1 (so when the offset is reached, the square is rendered)
+ *          to the bottom right (+1 so when the offset is reached, the square is rendered)
+ *          The offset is added to the coordinates, so the grid moves if the player velocity is nonzero.
+ *          sets the sprite of the gameObject to the correct coordinate position, and draws it to the screen
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::renderGrid()
 {
 
-    for (int arr_x = upperLeftSquare.x - 2; arr_x < (upperLeftSquare.x + objectsToDisplay) + 4; ++arr_x)
+    for (int arr_x = upperLeftSquare.x - 1; arr_x < (upperLeftSquare.x + objectsToDisplay) + 2; ++arr_x)
     {
-        for (int arr_y = upperLeftSquare.y - 2; arr_y < (upperLeftSquare.y + objectsToDisplay) + 4; ++arr_y)
+        for (int arr_y = upperLeftSquare.y - 1; arr_y < (upperLeftSquare.y + objectsToDisplay) + 2; ++arr_y)
         {
             float x_coords = ((m_maze[arr_x][arr_y].arrIndexX - upperLeftSquare.x + 2) * squareSize) - 2*squareSize;
             float y_coords = ((m_maze[arr_x][arr_y].arrIndexY - upperLeftSquare.y + 2) * squareSize) - 2*squareSize;
@@ -629,12 +630,15 @@ void Gameplay::resetLevel()
  */
 const GameObject Gameplay::blockMouseIsOn() const
 {
+    // scales the position of the mouse to m_width & m_height, since everything else is in terms of m_width and m_height
     float mouseX = sf::Mouse::getPosition(*m_window).x;
     float mouseY = sf::Mouse::getPosition(*m_window).y;
     mouseX /= m_window->getSize().x;
     mouseY /= m_window->getSize().y;
     mouseX *= m_width;
     mouseY *= m_height;
+
+
     int x = ((mouseX - gridOffset.x)/ squareSize) + upperLeftSquare.x;
     int y = ((mouseY - gridOffset.y) / squareSize) + upperLeftSquare.y;
     if (x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)
@@ -659,11 +663,16 @@ sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief calculates collision and returns a vector of squares the player is currently on
+ * @details First, the player coordinates are converted to indexes. It then checks if the block the
+ *          center of the user on is out of bounds. if it is not, it pushes that GameObject to the array.
+ *          It then checks if the block to the immediate left of the player is out of bounds. If it is not,
+ *          it sees whether or not the player is partially inside it. If it is, it pushes the GameObject to the 
+ *          end of the vector. The same process for the left side is repeated for the top, bottom, and right
+ *          side.
+ * @throw None
+ * @param None
+ * @return std::vector<GameObject> - a vector of GameObjects the player is currenty on
  */
 std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 {
@@ -671,35 +680,35 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
     unsigned int x = ((player.x - gridOffset.x) / squareSize) + upperLeftSquare.x; // dont calculate offset
     unsigned int y = ((player.y - gridOffset.y) / squareSize) + upperLeftSquare.y;
 
-    if (!(x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
+    if (!(x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)) // if block center is on not out of bounds
     {
         blocks.push_back(m_maze[x][y]);
     }
 
-    if (!(x-1 >= GRID_SIZE || x-1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
+    if (!(x-1 >= GRID_SIZE || x-1 < 0 || y >= GRID_SIZE || y < 0)) // if block to left not out of bounds
     { 
-        if (player.x - 0.5*player.sprite.getGlobalBounds().width < indexToCoord(x-1, y).x + squareSize)
+        if (player.x - 0.5*player.sprite.getGlobalBounds().width < indexToCoord(x-1, y).x + squareSize) // if player on it
         {
             blocks.push_back(m_maze[x-1][y]);
         }
     }
-    if (!(x+1 >= GRID_SIZE || x+1 < 0 || y >= GRID_SIZE || y < 0)) // if not out of bounds
+    if (!(x+1 >= GRID_SIZE || x+1 < 0 || y >= GRID_SIZE || y < 0)) // if block to right not out of bounds
     {
-        if (player.x + 0.5*player.sprite.getGlobalBounds().width > indexToCoord(x+1, y).x)
+        if (player.x + 0.5*player.sprite.getGlobalBounds().width > indexToCoord(x+1, y).x) // if player on it
         {
             blocks.push_back(m_maze[x+1][y]);
         }
     }
-    if (!(x >= GRID_SIZE || x < 0 || y-1 >= GRID_SIZE || y-1 < 0)) // if not out of bounds
+    if (!(x >= GRID_SIZE || x < 0 || y-1 >= GRID_SIZE || y-1 < 0)) // if block below not out of bounds
     {
-        if (player.y - 0.5*player.sprite.getGlobalBounds().height < indexToCoord(x, y).y)
+        if (player.y - 0.5*player.sprite.getGlobalBounds().height < indexToCoord(x, y).y) // if player on it
         {
             blocks.push_back(m_maze[x][y-1]);
         }
     }
-    if (!(x >= GRID_SIZE || x < 0 || y+1 >= GRID_SIZE || y+1 < 0)) // if not out of bounds
+    if (!(x >= GRID_SIZE || x < 0 || y+1 >= GRID_SIZE || y+1 < 0)) // if block above not out of bounds
     {
-        if (player.y + 0.5 * player.sprite.getGlobalBounds().height > indexToCoord(x, y+1).y)
+        if (player.y + 0.5 * player.sprite.getGlobalBounds().height > indexToCoord(x, y+1).y) // if player on it
         {
             blocks.push_back(m_maze[x][y+1]);
         }
@@ -708,11 +717,14 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief deals with input for the in game settings (when Escape is pressed)
+ * @details deals with input for ingame settings. When Mouse Left is clicked on 
+ *          specific areas of the screen, the Back to Game button  launches the user into the game again.
+ *          The Main Menu button launches the user into the title screen, and the settings button launches the user
+ *          into the settings page.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::pausedScreenInput()
 {
@@ -764,11 +776,14 @@ void Gameplay::pausedScreenInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief deals with input if the current screen is settings_screen
+ * @details If the user clicks on a setting such playMusic Yes, that setting boolean gets updated.
+ *          The full list of settings are as follow: playMusic - Yes - No, 
+ *          playAudio - Yes - No, Difficulty - Easy - Hard, Frame Rate - 30 - 60 -120,
+ *          and show FPS - Yes, No
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::settingsScreenInput()
 {
@@ -777,13 +792,13 @@ void Gameplay::settingsScreenInput()
     float height = m_window->getSize().y;
     while(m_window->pollEvent(event))
     {
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed) // if user clicks top right x in window
         {
             m_window->close();
         }
         else if (event.type == sf::Event::MouseButtonPressed)
         {
-            if (event.mouseButton.button == sf::Mouse::Left)
+            if (event.mouseButton.button == sf::Mouse::Left) // ifuser clicks mouse left
             {
                 if (event.mouseButton.x >= width * 0.30 &&
                     event.mouseButton.x <= width * 0.37)
@@ -791,7 +806,7 @@ void Gameplay::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
-                        std::cout << "Gameplay: Play Music 'Yes' button pressed\n";
+                        // Gameplay: Play Music 'Yes' button pressed
                         m_settings->playMusic = true;
                         if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
                         {
@@ -801,26 +816,26 @@ void Gameplay::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        std::cout << "Gameplay: Play Audio 'Yes' button pressed\n";
+                        // Gameplay: Play Audio 'Yes' button pressed
                         m_settings->playAudio = true;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        std::cout << "Gameplay: Difficulty 'Easy' button pressed\n";
+                        // Gameplay: Difficulty 'Easy' button pressed
                         m_settings->difficulty = 0;
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
-                        std::cout << "Gameplay: FPS '30' button pressed\n";
+                        // Gameplay: FPS '30' button pressed
                         m_settings->frameRate = 30;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
-                        std::cout << "Gameplay: Show FPS 'Yes' button pressed\n";
+                        // Gameplay: Show FPS 'Yes' button pressed
                         m_settings->showFps = true;
                     }
                 }
@@ -830,7 +845,7 @@ void Gameplay::settingsScreenInput()
                     if (event.mouseButton.y >=height * 0.25 &&
                         event.mouseButton.y <=height * 0.30)
                     {
-                        std::cout << "Gameplay: Play Music 'No' button pressed\n";
+                        // Gameplay: Play Music 'No' button pressed
                         m_settings->playMusic = false;
                         if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
                         {
@@ -840,26 +855,26 @@ void Gameplay::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        std::cout << "Gameplay: Play Audio 'No' button pressed\n";
+                        // Gameplay: Play Audio 'No' button pressed
                         m_settings->playAudio = false;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        std::cout << "Gameplay: Difficulty 'Hard' button pressed\n";
+                        // Gameplay: Difficulty 'Hard' button pressed
                         m_settings->difficulty = 1;
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
-                        std::cout << "Gameplay: FPS '60' button pressed\n";
+                        // Gameplay: FPS '60' button pressed
                         m_settings->frameRate = 60;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
-                        std::cout << "Gameplay: Show FPS 'No' button pressed\n";
+                        // Gameplay: Show FPS 'No' button pressed
                         m_settings->showFps = false;
                     }
                 }
@@ -869,7 +884,7 @@ void Gameplay::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
-                        std::cout << "Gameplay: FPS '120' button pressed\n";
+                        // Gameplay: FPS '120' button pressed
                         m_settings->frameRate = 120;
                         m_window->setFramerateLimit(m_settings->frameRate);
                     }
@@ -880,6 +895,7 @@ void Gameplay::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
+                        // Gameplay: Back button pressed (back to ingame settings)
                         updateSettingsStruct();
                         m_screenName = "paused_screen";
                     }
@@ -890,6 +906,7 @@ void Gameplay::settingsScreenInput()
         {
             if (event.key.code == sf::Keyboard::Escape)
             {
+                // Escape key pressed, and launched in game settings
                 m_screenName = "paused_screen";
             }
         }
@@ -897,11 +914,13 @@ void Gameplay::settingsScreenInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Renders in game settings screen
+ * @details creates a rectangle and displays it on each setting, if that setting is True.
+ *          This creates the box around each setting, so the user knows which one is selected.
+ *          renderSettingsScreen() does not render the settings background.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::renderSettingsScreen()
 {
@@ -971,11 +990,15 @@ void Gameplay::renderSettingsScreen()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @ Calculates the player velocity based on the distance to the selected square (m_squareToMoveTo)
+ * @details calculates the distance on the x axis  and the y axis etween the player coordinates and m_squareToMoveTo.
+ *          The absolute value of each x_distance and y_distance are added together to form total_distance.
+ *          If there is no selected square, or the total_distance is very negligable, then the
+ *          velocity is 0 for both x and y. Otherwise, the x velocity is (-75*x_distance/total_distance) / frameRate,
+ *          and likewise for y velocity. This keeps the velocity frameRate independent.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::calculatePlayerVelocity()
 {
@@ -983,6 +1006,7 @@ void Gameplay::calculatePlayerVelocity()
     float y_distance = m_squareToMoveTo.getPosition().y + 0.5 * squareSize - player.y;
     float total_distance = std::abs(x_distance) + std::abs(y_distance);
     
+    // if no selected square or total_distanace is very negligable (keeps it from bouncing around square)
     if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 2)
     {
         player.velocity.x = 0;
@@ -995,11 +1019,12 @@ void Gameplay::calculatePlayerVelocity()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Loads the current settings to settings.csv
+ * @details An fstream file opens user_data/settings.csv, where the contents are
+ *          overwritten with parameter names and their respective values
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::updateSettingsStruct()
 {
