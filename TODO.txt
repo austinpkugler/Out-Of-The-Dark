@@ -9,3 +9,7 @@ add default levels
 mayhbe add burning overlay
 back on maze builder prompts user to save
 convert .py to exe see if it can work without python dependency (it should)
+
+preveiw crashes with big maze
+player can glitchy through corner
+crashes if level doenst escIst
