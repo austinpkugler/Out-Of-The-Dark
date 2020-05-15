@@ -26,7 +26,7 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     m_music = music;
     m_width = width;
     m_height = height;
-    objectsToDisplay = 25; // draw 25 squares on a screen
+    objectsToDisplay = 19; // draw 19 squares on a screen
     TEXTURE_SIZE = 250.0f; // size of square in pixels
     gridOffset.x = 0;
     gridOffset.y = 0;
@@ -406,9 +406,9 @@ void Gameplay::displayHealth()
 void Gameplay::calculateCollision()
 {
     std::vector<GameObject> objectsStandingOn = blocksPlayerIsOn();
-    // If the texture is a trap
     for (int i = 0; i < objectsStandingOn.size(); ++i)
     {
+        // If the texture is a trap
         if (objectsStandingOn[i].textureIndex == 1)
         {
             player.healthPercent -= 40;
@@ -471,6 +471,7 @@ void Gameplay::calculateCollision()
     if (player.poisoned && player.poisonedLength % (m_settings->frameRate / 5) == 0)
     {
         player.healthPercent -= 1;
+
         if (m_settings->frameRate == player.poisonedLength)
         {
             player.poisoned = false;
@@ -480,6 +481,9 @@ void Gameplay::calculateCollision()
     if (player.poisoned)
     {
         player.poisonedLength++;
+        // Cuts velocity by half when on square
+        player.velocity.x /= 2;
+        player.velocity.y /= 2;
     }
 
     if (player.healthPercent <= 0)
@@ -1007,15 +1011,15 @@ void Gameplay::calculatePlayerVelocity()
     float total_distance = std::abs(x_distance) + std::abs(y_distance);
     
     // if no selected square or total_distanace is very negligable (keeps it from bouncing around square)
-    if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 2)
+    if (m_squareToMoveTo.getPosition().x == -1 || total_distance < 5)
     {
         player.velocity.x = 0;
         player.velocity.y = 0;
         return;
     }
 
-    player.velocity.x = (-75 * x_distance / total_distance) / m_settings->frameRate;
-    player.velocity.y = (-75 * y_distance / total_distance) / m_settings->frameRate;
+    player.velocity.x = (-2*squareSize * x_distance / total_distance) / m_settings->frameRate;
+    player.velocity.y = (-2*squareSize * y_distance / total_distance) / m_settings->frameRate;
 }
 
 /**
