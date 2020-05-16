@@ -1,12 +1,23 @@
 #pragma once
 
-#include "SFML/Graphics.hpp"
-#include "SFML/Audio.hpp"
-#include "settings.h"
+// Included C++11 Libraries
 #include <string>
 
+// Included Graphics Library Dependencies
+#include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 
+// Included Local Dependencies
+#include "settings.h"
 
+/**
+ * Class Name: Section
+ * Brief: The parent of all child classes used for running the game.
+ * Description:
+ *  Contains functions for running vital game processes that occur every frame
+ *  of the game. The functions present in this class can be overwritten by child
+ *  classes
+ */
 class Section
 {
 public:

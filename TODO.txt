@@ -1,15 +1,9 @@
-bloodied path doesnt do anything (this is fine AHHH shoulda replaced with health square)
-Add message like 'arrow keys to move' on maze builder
-do play audio stuff?
-guide or instructions of some kind (include damage)
-poison damage is still tied to fps
-finish comments
-maybe have different songs
-add default levels
-mayhbe add burning overlay
-back on maze builder prompts user to save
-convert .py to exe see if it can work without python dependency (it should)
-
-preveiw crashes with big maze
-player can glitchy through corner
-crashes if level doenst escIst
+add some animations
+add some sound on button clicks
+add an installer on github using Advanced installer
+create more blocks
+add randomly generated maze in maze builder
+make preview maze show whole maze
+make youtube video
+make spaces in maze file names legal
+if the window is not focused, stop everything

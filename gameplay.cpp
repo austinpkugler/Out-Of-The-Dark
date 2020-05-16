@@ -86,7 +86,6 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
 /**
  * @brief Destructor for the Gameplay class.
  * @details Deletes the allocated memory for all game textures.
- * @throw None
  */
 Gameplay::~Gameplay()
 {
@@ -94,6 +93,7 @@ Gameplay::~Gameplay()
     delete hardModeTexture;
     delete pausedScreenTexture;
     delete settingsScreenTexture;
+    delete player.texturePtr;
     delete winScreenTexture;
     delete player.texturePtr;
     for (int i = 0; i < 8; i++)
@@ -105,9 +105,10 @@ Gameplay::~Gameplay()
 /**
  * @brief Manages the loading of all Gameplay assets.
  * @details Loads assets required for gameplay, including player sprite and
- * grid textures.
+ * grid textures. This function is virtual and overrides the parent Section
+ * load() function.
  * @throw SFML exceptions are thrown when assets fail to load. The program may
- * terminate when fatal errors occur. This function is called from a master 
+ * terminate when fatal errors occur. This function is called from a master
  * load() function in the Game class.
  * @param None
  * @return None
@@ -216,7 +217,8 @@ void Gameplay::load()
  * @brief Updates all gameplay variables based on events that occur.
  * @details Handles checking for death, applying of damage, calculating new
  * player posistions, and other graphical updates. This function is called from
- * a master update() function in the Game class.
+ * a master update() function in the Game class. This function is virtual and 
+ * overrides the parent Section update() function.
  * @throw SFML exceptions may be thrown during fatal errors.
  * @param None
  * @return None
@@ -273,7 +275,8 @@ void Gameplay::update()
  * @details All input events are checked for and the proper function calls are
  * made. This includes input related to player movement and ingame virtual
  * button presses. This function is called from a master handleInput() function
- * in the Game class.
+ * in the Game class. This function is virtual and overrides the parent Section
+ * handleInput() function.
  * @throw SFML exceptions may be thrown during fatal errors.
  * @param None
  * @return None
@@ -331,6 +334,7 @@ void Gameplay::handleInput()
  * @brief Displays all Gameplay assets to the screen.
  * @details The player sprite, grid textures, and overlays are displayed. This
  * function is called from a master render() function in the Game class.
+ * This function is virtual and overrides the parent Section load() function.
  * @throw SFML exceptions may be thrown during fatal errors.
  * @param None
  * @return None
@@ -397,11 +401,14 @@ void Gameplay::displayHealth()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Calculates player related collision and applies damage if applicable
+ * @details The position of the player is used to calculate what type of tile
+ * is being stood on. This function uses the stood-on tile to prevent the
+ * player from walking through unwalkable tiles and applies damage to the
+ * player when collision with a damage tile occurs.
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
  */
 void Gameplay::calculateCollision()
 {
@@ -494,13 +501,13 @@ void Gameplay::calculateCollision()
 }
 
 /**
- * @brief creates a 2d vector of GameObjects for the maze from a given file
- * @details opens a fstream object with member variable fileName as the file name.
- *          It reads in the grid size, and then uses a nested for loop to loop through
- *          all grid squares. It assigns correct textures, indexes, scales, and walkable bools
- *          to each square. If the current square is a starting block (red texture),
- *          then startingBlock.x and y are set to the current square. It closes the file
- *          after it is done.
+ * @brief Creates a 2d vector of GameObjects for the maze from a given file
+ * @details Opens a fstream object with member variable fileName as the file name.
+ * It reads in the grid size, and then uses a nested for loop to loop through
+ * all grid squares. It assigns correct textures, indexes, scales, and walkable bools
+ * to each square. If the current square is a starting block (red texture),
+ * then startingBlock.x and y are set to the current square. It closes the file
+ * after it is done.
  * @throw None
  * @param None
  * @return None
@@ -554,11 +561,11 @@ void Gameplay::populateGrid()
 }
 
 /**
- * @brief renders the maze, including a layer of blocks the user cannot see around the screen
- * @details loops through upper left corner of the maze - 1 (so when the offset is reached, the square is rendered)
- *          to the bottom right (+1 so when the offset is reached, the square is rendered)
- *          The offset is added to the coordinates, so the grid moves if the player velocity is nonzero.
- *          sets the sprite of the gameObject to the correct coordinate position, and draws it to the screen
+ * @brief Renders the maze, including a layer of blocks the user cannot see around the screen
+ * @details Loops through upper left corner of the maze - 1 (so when the offset is reached, the square is rendered)
+ * to the bottom right (+1 so when the offset is reached, the square is rendered)
+ * The offset is added to the coordinates, so the grid moves if the player velocity is nonzero.
+ * sets the sprite of the gameObject to the correct coordinate position, and draws it to the screen
  * @throw None
  * @param None
  * @return None
@@ -672,13 +679,13 @@ sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 }
 
 /**
- * @brief calculates collision and returns a vector of squares the player is currently on
+ * @brief Calculates collision and returns a vector of squares the player is currently on.
  * @details First, the player coordinates are converted to indexes. It then checks if the block the
- *          center of the user on is out of bounds. if it is not, it pushes that GameObject to the array.
- *          It then checks if the block to the immediate left of the player is out of bounds. If it is not,
- *          it sees whether or not the player is partially inside it. If it is, it pushes the GameObject to the 
- *          end of the vector. The same process for the left side is repeated for the top, bottom, and right
- *          side.
+ * center of the user on is out of bounds. if it is not, it pushes that GameObject to the array.
+ * It then checks if the block to the immediate left of the player is out of bounds. If it is not,
+ * it sees whether or not the player is partially inside it. If it is, it pushes the GameObject to the 
+ * end of the vector. The same process for the left side is repeated for the top, bottom, and right
+ * side.
  * @throw None
  * @param None
  * @return std::vector<GameObject> - a vector of GameObjects the player is currenty on
@@ -726,11 +733,11 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
 }
 
 /**
- * @brief deals with input for the in game settings (when Escape is pressed)
- * @details deals with input for ingame settings. When Mouse Left is clicked on 
- *          specific areas of the screen, the Back to Game button  launches the user into the game again.
- *          The Main Menu button launches the user into the title screen, and the settings button launches the user
- *          into the settings page.
+ * @brief Deals with input for the ingame settings (when Escape is pressed).
+ * @details Deals with input for ingame settings. When Mouse Left is clicked on 
+ * specific areas of the screen, the Back to Game button  launches the user into the game again.
+ * The Main Menu button launches the user into the title screen, and the settings button launches the user
+ * into the settings page.
  * @throw None
  * @param None
  * @return None
@@ -756,19 +763,19 @@ void Gameplay::pausedScreenInput()
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
-                        std::cout << "Gameplay: 'Back To Game' button pressed\n";
+                        // std::cout << "Gameplay: 'Back To Game' button pressed\n";
                         m_screenName = "game_screen";
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        std::cout << "Gameplay: 'Main Menu' button pressed\n";
+                        // std::cout << "Gameplay: 'Main Menu' button pressed\n";
                         m_sectionName = "menu";
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
-                        std::cout << "Gameplay: 'Settings' button pressed\n";
+                        // std::cout << "Gameplay: 'Settings' button pressed\n";
                         m_screenName = "settings_screen";
                     }
                 }
@@ -785,11 +792,11 @@ void Gameplay::pausedScreenInput()
 }
 
 /**
- * @brief deals with input if the current screen is settings_screen
+ * @brief Deals with input if the current screen is settings_screen.
  * @details If the user clicks on a setting such playMusic Yes, that setting boolean gets updated.
- *          The full list of settings are as follow: playMusic - Yes - No, 
- *          playAudio - Yes - No, Difficulty - Easy - Hard, Frame Rate - 30 - 60 -120,
- *          and show FPS - Yes, No
+ * The full list of settings are as follow: playMusic - Yes - No, 
+ * playAudio - Yes - No, Difficulty - Easy - Hard, Frame Rate - 30 - 60 -120,
+ * and show FPS - Yes, No
  * @throw None
  * @param None
  * @return None
@@ -923,10 +930,10 @@ void Gameplay::settingsScreenInput()
 }
 
 /**
- * @brief Renders in game settings screen
- * @details creates a rectangle and displays it on each setting, if that setting is True.
- *          This creates the box around each setting, so the user knows which one is selected.
- *          renderSettingsScreen() does not render the settings background.
+ * @brief Renders in game settings screen.
+ * @details Creates a rectangle and displays it on each setting, if that setting is True.
+ * This creates the box around each setting, so the user knows which one is selected.
+ * renderSettingsScreen() does not render the settings background.
  * @throw None
  * @param None
  * @return None
@@ -999,12 +1006,12 @@ void Gameplay::renderSettingsScreen()
 }
 
 /**
- * @ Calculates the player velocity based on the distance to the selected square (m_squareToMoveTo)
- * @details calculates the distance on the x axis  and the y axis etween the player coordinates and m_squareToMoveTo.
- *          The absolute value of each x_distance and y_distance are added together to form total_distance.
- *          If there is no selected square, or the total_distance is very negligable, then the
- *          velocity is 0 for both x and y. Otherwise, the x velocity is (-75*x_distance/total_distance) / frameRate,
- *          and likewise for y velocity. This keeps the velocity frameRate independent.
+ * @brief Calculates the player velocity based on the distance to the selected square (m_squareToMoveTo).
+ * @details Calculates the distance on the x axis  and the y axis etween the player coordinates and m_squareToMoveTo.
+ * The absolute value of each x_distance and y_distance are added together to form total_distance.
+ * If there is no selected square, or the total_distance is very negligable, then the
+ * velocity is 0 for both x and y. Otherwise, the x velocity is (-75*x_distance/total_distance) / frameRate,
+ * and likewise for y velocity. This keeps the velocity frameRate independent.
  * @throw None
  * @param None
  * @return None
@@ -1028,9 +1035,9 @@ void Gameplay::calculatePlayerVelocity()
 }
 
 /**
- * @brief Loads the current settings to settings.csv
+ * @brief Loads the current settings to settings.csv.
  * @details An fstream file opens user_data/settings.csv, where the contents are
- *          overwritten with parameter names and their respective values
+ * overwritten with parameter names and their respective values
  * @throw None
  * @param None
  * @return None

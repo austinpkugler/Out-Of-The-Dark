@@ -31,6 +31,7 @@ Game::~Game()
 {
     delete m_settings;
     delete m_section;
+    delete m_music;
 }
 
 /**

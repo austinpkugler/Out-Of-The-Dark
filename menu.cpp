@@ -1,10 +1,18 @@
 #include "menu.h"
 
 /**
- * @brief
- * @details
- * @throw
- * @param
+ * @brief Menu class constructor
+ * @details Initializes the varials required for running the launch menu.
+ * @throw SFML exceptions may be thrown during fatal errors, especially if
+ * assets fail to load.
+ * @param window - a pointer to an sf::RenderWindow instance. This is the base
+ * frame of the game.
+ * @param settings - a pointer to an instance of the Settings struct. It
+ * contains all user preferences in relation to the game.
+ * @param music - a pointer to an instance of sf::Music. It holds the music that
+ * is played throughout the game.
+ * @param width - a float containing the starting width of the game window.
+ * @param height - a float containing the starting height of the game window.
  */
 Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height)
 {
@@ -20,10 +28,8 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
+ * @brief Destructor for the Menu class.
+ * @details Deletes the allocated memory for all game textures.
  */
 Menu::~Menu()
 {
@@ -31,11 +37,13 @@ Menu::~Menu()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Manages the loading of all Menu assets.
+ * @details Loads assets required for displaying menu backgrounds, buttons, and
+ * launching the game.
+ * @throw SFML exceptions are thrown when assets fail to load. The program may
+ * terminate when fatal errors occur.
+ * @param None
+ * @return None
  */
 void Menu::load()
 {
@@ -89,11 +97,23 @@ void Menu::load()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Dummy function for updating the Menu.
+ * @details No updating is needed for the Menus, but as a child of Section the
+ * update function is called so must still exist.
+ * @throw None
+ * @param None
+ * @return None
+ */
+void Menu::update()
+{
+}
+
+/**
+ * @brief Manages Menu input and calls the relevant input handler.
+ * @details Input handlers are called based on the current game screen.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::handleInput()
 {
@@ -112,29 +132,19 @@ void Menu::handleInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
- */
-void Menu::update()
-{
-}
-
-/**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Displays all Menu assets to the screen.
+ * @details The relevant render functions are displayed based on the current
+ * screen. All backgrounds, buttons, and other graphics are displayed.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::render()
 {
-    m_window->draw(m_backgroundSprite); // draws background
+    m_window->draw(m_backgroundSprite);
     if (m_screenName == "settings_screen")
     {
-        renderSettingsScreen(); // draws boxes for settings
+        renderSettingsScreen();
     }
     if (m_screenName == "play_screen")
     {
@@ -143,11 +153,13 @@ void Menu::render()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Displays an overlay on the Settings screen.
+ * @details When the "Settings" button is pressed from the main menu this
+ * function is used to display the overlay to indicate what settings
+ * preferences are currently in use.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::renderSettingsScreen()
 {
@@ -217,11 +229,12 @@ void Menu::renderSettingsScreen()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Displays an overlay on the Play Game screen.
+ * @details Displays the text of the level that is currently loaded into each
+ * of the three save slots.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::renderPlayScreen()
 {
@@ -229,23 +242,22 @@ void Menu::renderPlayScreen()
     std::string slot1String = m_settings->saveSlot1.substr(m_settings->saveSlot1.find_last_of("/\\") + 1);
     std::string slot2String = m_settings->saveSlot2.substr(m_settings->saveSlot2.find_last_of("/\\") + 1);
     std::string slot3String = m_settings->saveSlot3.substr(m_settings->saveSlot3.find_last_of("/\\") + 1);
-
     m_saveSlot1Text.setString(slot1String);
     m_saveSlot2Text.setString(slot2String);
     m_saveSlot3Text.setString(slot3String);
-
     m_window->draw(m_saveSlot1Text);
     m_window->draw(m_saveSlot2Text);
     m_window->draw(m_saveSlot3Text);
-
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Updates the settings.csv file to the current settings loaded in m_settings.
+ * @details Opens a fstream file to update settings information. Data being written to the
+ * settings.csv file includes playMusic, playAudio, difficulty, frameRate, showFps, saveSlot1,
+ * saveSlot2, and saveSlot3
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::updateSettingsStruct()
 {
@@ -259,16 +271,17 @@ void Menu::updateSettingsStruct()
     file << "SAVESLOT_1, " << m_settings->saveSlot1 << '\n';
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
-    m_window->setFramerateLimit(m_settings->frameRate);
     file.close();
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Handles input related to the title screen, which is the first screen
+ * that appears upon launch.
+ * @details Handles input for buttons such as "Play Game," "Settings," and all
+ * other title screen buttons.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::titleScreenInput()
 {
@@ -291,27 +304,27 @@ void Menu::titleScreenInput()
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.3)
                     {
-                        std::cout << "Menu: 'Play Game' button pressed\n";
+                        // std::cout << "Menu: 'Play Game' button pressed\n";
                         m_screenName = "play_screen";
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.4)
                     {
-                        std::cout << "Menu: 'Settings' button pressed\n";
+                        // std::cout << "Menu: 'Settings' button pressed\n";
                         m_screenName = "settings_screen";
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.5)
                     {
-                        std::cout << "Menu: 'Maze builder' button pressed\n";
+                        // std::cout << "Menu: 'Maze builder' button pressed\n";
                         m_sectionName = "maze_builder";
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.6)
                     {
-                        std::cout << "Menu: 'Quit' button pressed\n";
+                        // std::cout << "Menu: 'Quit' button pressed\n";
                         m_window->close();
                     }
                 }
@@ -321,11 +334,12 @@ void Menu::titleScreenInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Handles input related to the play screen.
+ * @details Input for the play screen includes left-clicking to play a level and
+ * right-clicking to load a new level.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::playScreenInput()
 {
@@ -348,20 +362,19 @@ void Menu::playScreenInput()
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
-                        std::cout << "Menu: 'Save Slot 1' button pressed\n";
-                        std::cout << m_settings->saveSlot1;
+                        // std::cout << "Menu: 'Save Slot 1' button pressed\n";
                         m_sectionName = "save_slot_1";
                     }
                     else if (event.mouseButton.x >= width * 0.39 &&
                              event.mouseButton.x <= width * 0.61)
                     {
-                        std::cout << "Menu: 'Save Slot 2' button pressed\n";
+                        // std::cout << "Menu: 'Save Slot 2' button pressed\n";
                         m_sectionName = "save_slot_2";
                     }
                     else if (event.mouseButton.x >= width * 0.69 &&
                              event.mouseButton.x <= width * 0.91)
                     {
-                        std::cout << "Menu: 'Save Slot 3' button pressed\n";
+                        // std::cout << "Menu: 'Save Slot 3' button pressed\n";
                         m_sectionName = "save_slot_3";
                     }
                 }
@@ -384,19 +397,19 @@ void Menu::playScreenInput()
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
-                        std::cout << "Menu: 'Save Slot 1' open-file button pressed\n";
+                        // std::cout << "Menu: 'Save Slot 1' open-file button pressed\n";
                         loadFileToSaveSlot(1);
                     }
                     else if (event.mouseButton.x >= width * 0.39 &&
                              event.mouseButton.x <= width * 0.61)
                     {
-                        std::cout << "Menu: 'Save Slot 2' open-file button pressed\n";
+                        // std::cout << "Menu: 'Save Slot 2' open-file button pressed\n";
                         loadFileToSaveSlot(2);
                     }
                     else if (event.mouseButton.x >= width * 0.69 &&
                              event.mouseButton.x <= width * 0.91)
                     {
-                        std::cout << "Menu: 'Save Slot 3' open-file button pressed\n";
+                        // std::cout << "Menu: 'Save Slot 3' open-file button pressed\n";
                         loadFileToSaveSlot(3);
                     }
                 }
@@ -415,11 +428,12 @@ void Menu::playScreenInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Handles input related to the settings screen.
+ * @details Input for the settings screen includes button presses to change
+ * setting preferences.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Menu::settingsScreenInput()
 {
@@ -540,11 +554,12 @@ void Menu::settingsScreenInput()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief Loads a .maze file to one of the three save slots.
+ * @details Utilizes Python scripts for prompting the user with file explorer
+ * so that a level can be selected.
+ * @throw Both C++ and Python errors can be thrown during fatal errors.
+ * @param saveSlot - Specifies which of the three save slots to link.
+ * @return None
  */
 void Menu::loadFileToSaveSlot(int saveSlot)
 {
@@ -563,7 +578,6 @@ void Menu::loadFileToSaveSlot(int saveSlot)
     }
 
     filePath = "python getMazeName/openFile.py " + filePath;
-    std::cout << "filePath " << filePath;
     
     system(filePath.c_str());
     std::fstream file("getMazeName/filename.txt", std::ios::in);
@@ -582,7 +596,5 @@ void Menu::loadFileToSaveSlot(int saveSlot)
     {
         m_settings->saveSlot3 = filePath;
     }
-
     updateSettingsStruct();
-
 }

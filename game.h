@@ -22,7 +22,7 @@
 
 /**
  * Class Name: Game
- * Brief: Manages gamewide processes
+ * Brief: Manages Game processes
  * Description:
  *  The Game class contains all general functions required at every stage of
  *  the game. There should only be a single instance at any given time. In this

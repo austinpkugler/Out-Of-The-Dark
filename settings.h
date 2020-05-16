@@ -1,7 +1,14 @@
 #pragma once
 
+// Included C++11 Libraries
 #include <string>
 
+/**
+ * Struct Name: Settings
+ * Brief: Stores all of the user's settings preferences.
+ * Description:
+ *  Contains all variables related to user-controllable game settings.
+ */
 struct Settings
 {
     bool playMusic;

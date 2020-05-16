@@ -5,14 +5,9 @@ import sys
 root = tk.Tk()
 root.withdraw()
 recommended_filename = ""
-try:
-    
-    recommended_filename = sys.argv[-1].split('/')
-    print(recommended_filename)
-
-    recommended_filename = recommended_filename[-1]
+try: # if the c++ system() call had an argument for the script
+    recommended_filename = sys.argv[1].split('/')[-1] # gets file name without path given by c++
 except IndexError:
-    print("epic fail")
     pass
 file_path = filedialog.askopenfilename(defaultextension=".maze", filetypes=(("MAZE file", "*.maze"),), initialfile=recommended_filename)
 with open("getMazeName/filename.txt", 'w') as file:
