@@ -253,6 +253,15 @@ void MazeBuilder::drawGrid()
     }
 }
 
+/**
+ * @brief takes in a gridStruct block as a parameter and returns true if the mouse is currently on the block, false otherwise
+ * @details First, the coordinates of the block's x and y are converted from array indexes to coordinates on the screen.
+ *          The Mouse coordinates are then scaled to fit the original screen size. The function then returns True if 
+ *          the mouse is in the boundaries of the block, False if not.
+ * @throw None
+ * @param const gridStruct& block - a gridStruct object to check if the mouse is on
+ * @return bool - True if the mouse is in the block parameter, False otherwise
+ */
 bool MazeBuilder::isMouseOnBlock(const gridStruct& block) const
 {
     // std::cout << "isMouseOnBlock is called\n";
@@ -263,12 +272,14 @@ bool MazeBuilder::isMouseOnBlock(const gridStruct& block) const
 
     float mouseX = sf::Mouse::getPosition(*m_window).x;
     float mouseY = sf::Mouse::getPosition(*m_window).y;
+
+    // scales mouse coords
     mouseX /= m_window->getSize().x;
     mouseY /= m_window->getSize().y;
     mouseX *= m_width;
     mouseY *= m_height;
     
-
+    // if mouse in block
     if (x_coords <= mouseX && mouseX <= x_coords + m_squareSize &&
         y_coords <= mouseY && mouseY <= y_coords + m_squareSize)
     {
@@ -278,7 +289,21 @@ bool MazeBuilder::isMouseOnBlock(const gridStruct& block) const
 
 }
 
-
+/**
+ * @brief polls input and updates screen based off of it
+ * @details polls input and updates screen based off of input. Full list of actions include
+ *          closing the window if the user presses the upper right red square on the window,
+ *          changing the selected texture if the mouse is clicked on a texture,
+ *          loading the file if the load button is pressed,
+ *          saving the file if the save button is pressed,
+ *          previewing the maze if the preview button is pressed,
+ *          changing the highlightedSquare if the mosue moves to a different square,
+ *          changing the texture of the highlighted square if the left mouse button is down,
+ *          and changing the upperLeftSquare if the user presses arrow keys or wasd keys
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::handleInput()
 {
     // std::cout << "handleInput is called\n";
@@ -447,9 +472,17 @@ void MazeBuilder::handleInput()
     }
 }
 
+/**
+ * @brief updates the section between input handling and rendering
+ * @details resets the position to the current texture rectangle based off of m_selectedTextureIndex,
+ *          and resets the string to print at the bottom right screen for the current block position based
+ *          off of the current m_highlightedGridRect coordinates.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::update()
 {
-        // std::cout << "update is called\n";
 
     if (m_selectedTextureIndex == 0)
     {
@@ -489,6 +522,14 @@ void MazeBuilder::update()
     // std::cout << "update is finished\n";
 }
 
+/**
+ * @brief renders the MazeBuilder screen
+ * @details renders the background, highlighted texture, highlighted grid square (if there is one), and 
+ *          the grid location
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::render()
 {
     // std::cout << "render is called\n";
@@ -504,9 +545,17 @@ void MazeBuilder::render()
     m_window->draw(m_gridLocation);
 }
 
+/**
+ * @brief draws the highlighted grid square to the screen
+ * @details First, coordinates of the highlightedGrid square are converted from indexes to pixels.
+ *          The coordinates are then set to the m_highlightedGridRect object, and drawn to the
+ *          screen.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::highlightGridSquare()
 {
-    // std::cout << "highlightGridSquare is called\n";
     // gets location to be drawn on screen
     float pixelX = (m_highlightedGridIndex.x - m_upperLeftSquare.x)*m_squareSize + m_mazeOrigin.x;
     float pixelY = (m_highlightedGridIndex.y - m_upperLeftSquare.y)*m_squareSize + m_mazeOrigin.y;
@@ -515,7 +564,16 @@ void MazeBuilder::highlightGridSquare()
     m_window->draw(m_highlightedGridRect);
 }
 
-
+/**
+ * @brief resizes the square size and grid to preview most of the maze on one screen (either zooms in or out)
+ * @details First, the m_screenName is set to "preview_screen". Then, the maze is iterated through using 2D
+ *          nested for loops, and the bottom, top, left, and right sides of the maze are found.
+ *          If not all of them are found, then the preview_screen cannot work and the function is exited.
+ *          the m_squaresToDisplay is updated based on the bottom, top, left, and right values, and the grid is resized.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::toPreview()
 {
     m_screenName = "preview_screen";
@@ -563,6 +621,17 @@ void MazeBuilder::toPreview()
     m_highlightedGridRect.setSize(sf::Vector2f(m_squareSize, m_squareSize));
 }
 
+
+/**
+ * @brief puts the maze builder back in main mode, from preview mode
+ * @details First, the m_screenName is set to "main_screen". The squaresToDisplay is set
+ *          back to its normal value, instead of being based on the number of blocks created as with
+ *          the preview mode. the squareSize, upperLeftSquare coordinates and sprite scales are
+ *          all calculated again to completely return back from preview_screen mode.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::toMain() // called after state machine is changed to main
 {
     // std::cout << "toMain is called\n";
