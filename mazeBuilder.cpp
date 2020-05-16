@@ -1,7 +1,15 @@
 #include "mazeBuilder.h"
-// constructor for MazeBuilder class
-// no return
-// no parameters
+
+/**
+ * @brief Constructor for MazeBuilder class.
+ * @details sets member variables to corresponding parameters, and other 
+ *          necessary function to start the section such as load().
+ * @throw None
+ * @param sf::RenderWindow* window - a pointer to a window. used for rendering sprites to screen
+ * @param Settings* settings - a pointer to a Settings struct, used for editing and using setting info
+ * @param float width - width of starting window (used for scaling)
+ * @param float height - height of starting window (used for scaling)
+ */
 MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float width, float height)
 {
     m_window = window;
@@ -44,12 +52,33 @@ MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float wid
     m_textureHighlightRect.setFillColor(sf::Color(230, 230, 220, 150));
 
 }
+
+
+/**
+ * @brief Destructor for MazeBuilder class
+ * @details deallocates all heap pointers.
+ * @throw None
+ * @param None
+ */
 MazeBuilder::~MazeBuilder() // destructor
 {
     delete m_backgroundTexture;
+    m_backgroundTexture = nullptr;
+
+    for (int i=0; i < m_textures.size(); ++i)
+    {
+        delete m_textures[i];
+        m_textures[i] = nullptr;
+    }
 }
 
-
+/**
+ * @brief loads all section wide assets
+ * @details loads all section wide assets such as backgrounds, textures, and fonts.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::load()
 {
     if (!m_backgroundTexture->loadFromFile("assets/maze_builder_background.png"))
@@ -108,6 +137,14 @@ void MazeBuilder::load()
     }
 }
 
+/**
+ * @brief saves current maze data to a file
+ * @details invokes a python script to open file explorer for user to save file. If a filename exists, it 
+ *          has that as the default save name
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::generateFile()
 {
     if (m_mazeFileName == "") // if there isnt a fileName, dont have recommended name
@@ -136,6 +173,14 @@ void MazeBuilder::generateFile()
     file.close();
 }
 
+/**
+ * @brief loads .maze file into maze builder
+ * @details invokes a python script to open file explorer for user to load file. If a filename already exists, it 
+ *          has that as the default load name
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::loadFromFile()
 {
     // opens file using python tkinter
@@ -158,7 +203,13 @@ void MazeBuilder::loadFromFile()
     file.close();
 }
 
-
+/**
+ * @brief populates the grid with default textures (wall)
+ * @details loops through the grid and creates a 2d array with proper textures and scales for walls
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::populateGrid()
 {
     for (int x = 0; x < m_MAX_GRID_SIZE; ++x)
@@ -177,6 +228,14 @@ void MazeBuilder::populateGrid()
     }
 }
 
+/**
+ * @brief draws the grid
+ * @details has a 2D nested for loop looping through all squares to display. It then sets the correct position and texture, and 
+ *          draws the sprite to the screen.
+ * @throw None
+ * @param None
+ * @return None
+ */
 void MazeBuilder::drawGrid()
 {
     // std::cout << "drawGrid is called\n";

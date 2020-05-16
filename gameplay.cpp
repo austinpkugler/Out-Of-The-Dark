@@ -494,11 +494,16 @@ void Gameplay::calculateCollision()
 }
 
 /**
- * @brief
- * @details
- * @throw
- * @param
- * @return
+ * @brief creates a 2d vector of GameObjects for the maze from a given file
+ * @details opens a fstream object with member variable fileName as the file name.
+ *          It reads in the grid size, and then uses a nested for loop to loop through
+ *          all grid squares. It assigns correct textures, indexes, scales, and walkable bools
+ *          to each square. If the current square is a starting block (red texture),
+ *          then startingBlock.x and y are set to the current square. It closes the file
+ *          after it is done.
+ * @throw None
+ * @param None
+ * @return None
  */
 void Gameplay::populateGrid()
 {
@@ -506,7 +511,7 @@ void Gameplay::populateGrid()
     file >> GRID_SIZE;
     for (int x = 0; x < GRID_SIZE; ++x)
     {
-        m_maze.push_back(std::vector<GameObject>());
+        m_maze.push_back(std::vector<GameObject>()); // creates another row
         for (int y = 0; y < GRID_SIZE; ++y)
         {
             m_maze[x].push_back(GameObject());
