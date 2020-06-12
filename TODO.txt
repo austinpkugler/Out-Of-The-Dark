@@ -2,8 +2,4 @@ add some animations
 add some sound on button clicks
 add an installer on github using Advanced installer
 create more blocks
-add randomly generated maze in maze builder
-make preview maze show whole maze
 make youtube video
-make spaces in maze file names legal
-if the window is not focused, stop everything

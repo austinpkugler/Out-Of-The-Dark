@@ -615,8 +615,23 @@ void MazeBuilder::toPreview()
     {
         return;
     }
-    m_squaresToDisplay = std::max(right-left, bottom-top)+2;
-    m_squareSize = static_cast<float>(std::max(m_width - m_mazeOrigin.x, m_height - m_mazeOrigin.y)) / m_squaresToDisplay;
+
+    float delta_x = right-left;
+    float delta_y = bottom-top;
+    float gridWidth = m_width - m_mazeOrigin.x;
+    float gridHeight = m_height - m_mazeOrigin.y;
+
+    if (delta_x/gridWidth > delta_y/gridHeight) // if size of maze (in x) is greater than size of maze (in y) after both are scaled by width and height
+    {
+        m_squaresToDisplay = delta_x + 2; // min amount of squares needed to display
+    }
+    else
+    {
+        m_squaresToDisplay = delta_y*(gridWidth/gridHeight);
+
+    }
+    
+    m_squareSize = static_cast<float>(std::max(gridWidth, gridHeight)) / m_squaresToDisplay;
     m_upperLeftSquare.x = left;
     m_upperLeftSquare.y = top;
     for (int i=0; i < m_MAX_GRID_SIZE; ++i)

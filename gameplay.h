@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"
@@ -90,8 +91,9 @@ private:
     void renderSettingsScreen();        // Renders in game settings screen.
     void calculatePlayerVelocity();     // Calculates the player velocity based on the distance to the selected square (m_squareToMoveTo).
     void updateSettingsStruct();        // Loads the current settings to settings.csv.
+    void rotatePlayerToMouse();
 
-    // Private SFML Member Variables
+    // Private Member Variables
     sf::RectangleShape healthBar;
     sf::RectangleShape healthBarBg;
     sf::RectangleShape m_highlightedGridRect;
@@ -112,7 +114,6 @@ private:
     std::vector<sf::Texture*> vectorOfTextures;
     sf::Music* m_music;
 
-    // Private Gameplay Member Variables
     std::vector<std::vector<GameObject>> m_maze;
     std::string fileName;
     unsigned int objectsToDisplay;

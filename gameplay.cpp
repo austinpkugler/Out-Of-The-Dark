@@ -214,6 +214,27 @@ void Gameplay::load()
 }
 
 /**
+ * @brief Rotates the player sprite to look towards where the mouse is
+ * @details changes the absolute rotation of the player sprite so it looks where
+ *          the mouse currently is. This is called every frame in Gamplay::update().
+ * 
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
+ */
+void Gameplay::rotatePlayerToMouse()
+{
+    const double pi = 3.14159265358979323846;
+    sf::Vector2i mouseCoordsInt = sf::Mouse::getPosition(*m_window);
+    sf::Vector2f mouseCoords(mouseCoordsInt.x, mouseCoordsInt.y);
+    mouseCoords.x /= m_window->getSize().x / m_width; 
+    mouseCoords.y /= m_window->getSize().y / m_height; 
+    float rotation = std::atan2(mouseCoords.x - player.x,
+                                mouseCoords.y - player.y);
+    player.sprite.setRotation(rotation*-180/pi);
+}
+
+/**
  * @brief Updates all gameplay variables based on events that occur.
  * @details Handles checking for death, applying of damage, calculating new
  * player posistions, and other graphical updates. This function is called from
@@ -227,6 +248,7 @@ void Gameplay::update()
 {
     if (m_screenName == "game_screen")
     {
+        rotatePlayerToMouse();
         calculatePlayerVelocity();
         calculateCollision();
 
@@ -291,6 +313,10 @@ void Gameplay::handleInput()
             if (event.type == sf::Event::Closed)
             {
                 m_window->close();
+            }
+            else if (event.type == sf::Event::LostFocus)
+            {
+                m_screenName = "paused_screen";
             }
             else if (event.type == sf::Event::MouseButtonPressed)
             {
