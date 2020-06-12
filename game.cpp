@@ -79,7 +79,7 @@ void Game::load()
 void Game::update()
 {
     m_section->update();
-    if (m_sectionName != m_section->getSectionName())
+    if (m_sectionName != m_section->getSectionName() && m_section->soundStatus() != sf::Sound::Status::Playing)
     {
         m_sectionName = m_section->getSectionName();
         delete m_section;

@@ -26,6 +26,7 @@ public:
     virtual void update() = 0;
     virtual void render() = 0;
     std::string getSectionName() const {return m_sectionName;}
+    sf::Sound::Status soundStatus() const {return m_sound.getStatus();}
 
 
 protected:

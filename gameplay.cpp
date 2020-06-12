@@ -190,7 +190,12 @@ void Gameplay::load()
         std::cout << "Gameplay: Failed to load asset 'win_background.png'\n";
         std::exit(1);
     }
-
+    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    {
+        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
+        std::exit(1);
+    }
+    m_sound.setBuffer(*m_soundBuffer);
     player.sprite.setTexture(*player.texturePtr);
     player.sprite.setScale((squareSize / 240.0f) * 0.7, (squareSize / 240.0f) * 0.7);
     player.sprite.setOrigin(player.sprite.getLocalBounds().width / 2, player.sprite.getLocalBounds().height / 2);
@@ -787,23 +792,25 @@ void Gameplay::pausedScreenInput()
                 if (event.mouseButton.x >= width * 0.10 &&
                     event.mouseButton.x <= width * 0.28)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
                         // std::cout << "Gameplay: 'Back To Game' button pressed\n";
+                        playClicked();
                         m_screenName = "game_screen";
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
                         // std::cout << "Gameplay: 'Main Menu' button pressed\n";
+                        playClicked();
                         m_sectionName = "menu";
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         // std::cout << "Gameplay: 'Settings' button pressed\n";
+                        playClicked();
                         m_screenName = "settings_screen";
                     }
                 }

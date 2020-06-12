@@ -309,12 +309,12 @@ void Menu::titleScreenInput()
                 if (event.mouseButton.x >= width * 0.10 &&
                     event.mouseButton.x <= width * 0.28)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.3)
                     {
                         // std::cout << "Menu: 'Play Game' button pressed\n";
                         m_screenName = "play_screen";
+                        playClicked();
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
@@ -322,12 +322,14 @@ void Menu::titleScreenInput()
                     {
                         // std::cout << "Menu: 'Settings' button pressed\n";
                         m_screenName = "settings_screen";
+                        playClicked();
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.5)
                     {
                         // std::cout << "Menu: 'Maze builder' button pressed\n";
+                        playClicked();
                         m_sectionName = "maze_builder";
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
@@ -465,11 +467,12 @@ void Menu::settingsScreenInput()
                 if (event.mouseButton.x >= width * 0.30 &&
                     event.mouseButton.x <= width * 0.37)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = true;
+                        playClicked();
+
                         if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
                         {
                             m_music->play();
@@ -478,38 +481,42 @@ void Menu::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        if (m_settings->playAudio == false)
-                        {
-                            m_settings->playAudio = true;
-                            playClicked();
-                        }
+                        m_settings->playAudio = true;
+                        playClicked();
+
 
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         m_settings->difficulty = 0;
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 30;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
                         m_settings->showFps = true;
+                        playClicked();
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.40 &&
                          event.mouseButton.x <= width * 0.48)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = false;
+                        playClicked();
+
                         if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
                         {
                             m_music->stop();
@@ -518,46 +525,55 @@ void Menu::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
+                        playClicked();
                         m_settings->playAudio = false;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         m_settings->difficulty = 1; // 0 is easy, 1 is hard
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 60;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
                         m_settings->showFps = false;
+                        playClicked();
+
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.50 &&
                          event.mouseButton.x <= width * 0.56)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
                         m_settings->frameRate = 120;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.10 &&
                          event.mouseButton.x <= width * 0.16)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
+                        playClicked();
                         updateSettingsStruct();
                         m_screenName = "title_screen";
                         load();
+
                     }
                 }
             }

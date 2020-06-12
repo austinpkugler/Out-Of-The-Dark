@@ -21,7 +21,7 @@ MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float wid
     m_settings = settings;
 
     load();
-
+    
     // member variables for grid
     m_MAX_GRID_SIZE = 512;
     m_upperLeftSquare.x = m_MAX_GRID_SIZE/2;
@@ -135,6 +135,12 @@ void MazeBuilder::load()
     {
         std::exit(1);
     }
+    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    {
+        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
+        std::exit(1);
+    }
+    m_sound.setBuffer(*m_soundBuffer);
 }
 
 /**
@@ -221,70 +227,83 @@ void MazeBuilder::handleInput()
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= 0.03 * width && event.mouseButton.x <= 0.19 * width)
                 {
-                    playClicked();
                     if (event.mouseButton.y >= 0.11 * height && event.mouseButton.y <= 0.19 * height)
                     {
                         // std::cout << "texture 1 pressed\n";
                         m_selectedTextureIndex = 0;
+                        playClicked();
+
                         
                     }
                     else if (event.mouseButton.y >= 0.21 * height && event.mouseButton.y <= 0.29 * height)
                     {
                         // std::cout << "texture 2 pressed\n";
                         m_selectedTextureIndex = 1;
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= 0.31 * height && event.mouseButton.y <= 0.39 * height)
                     {
                         // std::cout << "texture 3 pressed\n";
                         m_selectedTextureIndex = 2;
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.41 * height && event.mouseButton.y <= 0.49 * height)
                     {
                         // std::cout << "texture 4 pressed\n";
                         m_selectedTextureIndex = 3;
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.51 * height && event.mouseButton.y <= 0.59 * height)
                     {
                         // std::cout << "texture 5 pressed\n";
                         m_selectedTextureIndex = 4;
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.61 * height && event.mouseButton.y <= 0.69 * height)
                     {
                         // std::cout << "texture 6 pressed\n";
                         m_selectedTextureIndex = 5;
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.71 * height && event.mouseButton.y <= 0.79 * height)
                     {
                         // std::cout << "texture 7 pressed\n";
                         m_selectedTextureIndex = 6;
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.81 * height && event.mouseButton.y <= 0.89 * height)
                     {
                         // std::cout << "texture 8 pressed\n";
                         m_selectedTextureIndex = 7;
+                        playClicked();
                     }
                 }
 
                 if (event.mouseButton.y >= 0.015 * height && event.mouseButton.y <= 0.085 * height)
                 {
-                    playClicked();
                     if (event.mouseButton.x >= 0.22 * width && event.mouseButton.x <= 0.28 * width)
                     {
+                        playClicked();
                         loadFromFile();
+
                     }
 
                     if (event.mouseButton.x >= 0.32 * width && event.mouseButton.x <= 0.38 * width)
                     {
+                        playClicked();
                         generateFile();
                     }
                     if (event.mouseButton.x >= 0.4 * width && event.mouseButton.x <= 0.49 * width)
                     {
                         if (m_screenName == "main_screen")
                         {
+                            playClicked();
                             toPreview();
                         }
                         else if (m_screenName == "preview_screen")
                         {
+                            playClicked();
                             toMain();
                         }
                     }
@@ -292,6 +311,8 @@ void MazeBuilder::handleInput()
                     if (event.mouseButton.x >= 0.91 * width && event.mouseButton.x <= 0.98 * width)
                     {
                         m_sectionName = "menu"; // back button pressed
+                        playClicked();
+
                     }
                 }
             }
