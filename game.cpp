@@ -46,11 +46,6 @@ Game::~Game()
 void Game::load()
 {
     loadSettingsStruct();
-    if (!m_soundBuffer.loadFromFile("assets/clicked.wav"))
-    {
-        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
-        std::exit(1);
-    }
     if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
     {
         std::cout << "Game: Failed to load asset 'rm_typerighter.ttf'\n";
@@ -61,6 +56,7 @@ void Game::load()
         std::cout << "Game: Failed to load asset '2nd_Sonata_Malign_Chords.ogg'\n";
         std::exit(1);
     }
+    
     m_music->setVolume(20.f);
     m_music->setLoop(true);
 
@@ -196,24 +192,6 @@ int Game::getFps() const
 void Game::setFps(unsigned int fps)
 {
     m_fps = fps;
-}
-
-/**
- * @brief Plays the contents of the current sound buffer member variable.
- * @details The current audio in sf::SoundBuffer member variable m_soundBuffer
- * is played during function call.
- * @throw SFML exceptions may be thrown during fatal errors.
- * @param None
- * @return None
- */
-void Game::playSoundBuffer()
-{
-    if (m_settings->playAudio)
-    {
-        sf::Sound sound;
-        sound.setBuffer(m_soundBuffer);
-        sound.play();
-    }
 }
 
 /**

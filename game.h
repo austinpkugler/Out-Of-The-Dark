@@ -46,7 +46,6 @@ public:
     void clearScreen();             // Clears the game screen of all assets.
     int getFps() const;             // Getter function for the current FPS being displayed.
     void setFps(unsigned int);      // Updates the current FPS with the newest value.
-    void playSoundBuffer();         // Plays the contents of the current sound buffer member variable.
     bool isDone() const;            // Getter for the current status of the game.
     void loadSettingsStruct();      // Loads the settings from a .csv file.
 
@@ -55,7 +54,6 @@ private:
     sf::RenderWindow* m_window;     // SFML base frame for all graphics.
     sf::Font m_font;                // SFML instance of the game's generic font.
     sf::Music* m_music;             // SFML instance of the current game music.
-    sf::SoundBuffer m_soundBuffer;  // SFML instance of the current sound effect.
 
     // Private Game Member Variables
     Settings* m_settings;           // Pointer to the current settings configuration.

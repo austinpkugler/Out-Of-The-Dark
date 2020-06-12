@@ -24,6 +24,7 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
     m_screenName = "title_screen";
     m_sectionName = "menu";
     m_backgroundTexture = new sf::Texture();
+    m_soundBuffer = new sf::SoundBuffer();
     load();
 }
 
@@ -75,6 +76,13 @@ void Menu::load()
     {
         std::exit(1);
     }
+
+    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    {
+        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
+        std::exit(1);
+    }
+    m_sound.setBuffer(*m_soundBuffer);
 
     m_backgroundSprite.setTexture(*m_backgroundTexture);
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
@@ -301,6 +309,7 @@ void Menu::titleScreenInput()
                 if (event.mouseButton.x >= width * 0.10 &&
                     event.mouseButton.x <= width * 0.28)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.3)
                     {
@@ -359,6 +368,7 @@ void Menu::playScreenInput()
                 if (event.mouseButton.y >= height * 0.23 &&
                     event.mouseButton.y <= height * 0.69)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
@@ -381,6 +391,7 @@ void Menu::playScreenInput()
                 if (event.mouseButton.y >= height * 0.75 &&
                     event.mouseButton.y <= height * 0.8)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.1 &&
                     event.mouseButton.x <= width * 0.165)
                     {
@@ -394,6 +405,7 @@ void Menu::playScreenInput()
                 if (event.mouseButton.y >= height * 0.23 &&
                     event.mouseButton.y <= height * 0.69)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
@@ -453,6 +465,7 @@ void Menu::settingsScreenInput()
                 if (event.mouseButton.x >= width * 0.30 &&
                     event.mouseButton.x <= width * 0.37)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
@@ -465,7 +478,12 @@ void Menu::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
-                        m_settings->playAudio = true;
+                        if (m_settings->playAudio == false)
+                        {
+                            m_settings->playAudio = true;
+                            playClicked();
+                        }
+
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
@@ -487,6 +505,7 @@ void Menu::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.40 &&
                          event.mouseButton.x <= width * 0.48)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
@@ -521,6 +540,7 @@ void Menu::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.50 &&
                          event.mouseButton.x <= width * 0.56)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
@@ -531,6 +551,7 @@ void Menu::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.10 &&
                          event.mouseButton.x <= width * 0.16)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {

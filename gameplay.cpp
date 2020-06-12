@@ -324,6 +324,7 @@ void Gameplay::handleInput()
                 {
                     if (player.status == "alive")
                     {
+                        playClicked();
                         GameObject blockMouseOn = blockMouseIsOn();
                         if (blockMouseOn.arrIndexX != -1)
                         {
@@ -786,6 +787,7 @@ void Gameplay::pausedScreenInput()
                 if (event.mouseButton.x >= width * 0.10 &&
                     event.mouseButton.x <= width * 0.28)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
@@ -845,6 +847,7 @@ void Gameplay::settingsScreenInput()
                 if (event.mouseButton.x >= width * 0.30 &&
                     event.mouseButton.x <= width * 0.37)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
@@ -884,6 +887,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.40 &&
                          event.mouseButton.x <= width * 0.48)
                 {
+                    playClicked();
                     if (event.mouseButton.y >=height * 0.25 &&
                         event.mouseButton.y <=height * 0.30)
                     {
@@ -923,6 +927,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.50 &&
                          event.mouseButton.x <= width * 0.56)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
@@ -934,6 +939,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.10 &&
                          event.mouseButton.x <= width * 0.16)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {

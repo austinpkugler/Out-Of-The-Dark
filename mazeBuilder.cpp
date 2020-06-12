@@ -221,6 +221,7 @@ void MazeBuilder::handleInput()
                 float height = m_window->getSize().y;
                 if (event.mouseButton.x >= 0.03 * width && event.mouseButton.x <= 0.19 * width)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= 0.11 * height && event.mouseButton.y <= 0.19 * height)
                     {
                         // std::cout << "texture 1 pressed\n";
@@ -266,6 +267,7 @@ void MazeBuilder::handleInput()
 
                 if (event.mouseButton.y >= 0.015 * height && event.mouseButton.y <= 0.085 * height)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= 0.22 * width && event.mouseButton.x <= 0.28 * width)
                     {
                         loadFromFile();
