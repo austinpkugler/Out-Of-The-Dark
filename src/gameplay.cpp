@@ -120,77 +120,77 @@ void Gameplay::load()
         vectorOfTextures.push_back(new sf::Texture());
     }
 
-    if (!vectorOfTextures[0]->loadFromFile("assets/blue_floor_texture.png"))
+    if (!vectorOfTextures[0]->loadFromFile("../assets/blue_floor_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[1]->loadFromFile("assets/blue_floor_trapped_texture.png"))
+    if (!vectorOfTextures[1]->loadFromFile("../assets/blue_floor_trapped_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_trapped_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[2]->loadFromFile("assets/blue_floor_fire_texture.png"))
+    if (!vectorOfTextures[2]->loadFromFile("../assets/blue_floor_fire_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_fire_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[3]->loadFromFile("assets/death_texture.png"))
+    if (!vectorOfTextures[3]->loadFromFile("../assets/death_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'death_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[4]->loadFromFile("assets/wall_texture.png"))
+    if (!vectorOfTextures[4]->loadFromFile("../assets/wall_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'wall_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[5]->loadFromFile("assets/alien_texture.png"))
+    if (!vectorOfTextures[5]->loadFromFile("../assets/alien_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'alien_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[6]->loadFromFile("assets/start_texture.png"))
+    if (!vectorOfTextures[6]->loadFromFile("../assets/start_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'start_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[7]->loadFromFile("assets/end_texture.png"))
+    if (!vectorOfTextures[7]->loadFromFile("../assets/end_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'end_texture.png'\n";
         std::exit(1);
     }
-    if (!player.texturePtr->loadFromFile("assets/player.png"))
+    if (!player.texturePtr->loadFromFile("../assets/player.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'player.png'\n";
         std::exit(1);
     }
-    if (!deathScreenTexture->loadFromFile("assets/death_background.png"))
+    if (!deathScreenTexture->loadFromFile("../assets/death_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'death_background.png'\n";
         std::exit(1);
     }
-    if (!hardModeTexture->loadFromFile("assets/hard_mode_background.png"))
+    if (!hardModeTexture->loadFromFile("../assets/hard_mode_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'hard_mode_background.png'\n";
         std::exit(1);
     }
-    if (!pausedScreenTexture->loadFromFile("assets/paused_screen_background.png"))
+    if (!pausedScreenTexture->loadFromFile("../assets/paused_screen_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'paused_screen_background.png'\n";
         std::exit(1);
     }
-    if (!settingsScreenTexture->loadFromFile("assets/settings_screen_background.png"))
+    if (!settingsScreenTexture->loadFromFile("../assets/settings_screen_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'settings_screen_background.png'\n";
         std::exit(1);
     }
-    if (!winScreenTexture->loadFromFile("assets/win_background.png"))
+    if (!winScreenTexture->loadFromFile("../assets/win_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'win_background.png'\n";
         std::exit(1);
     }
-    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    if (!m_soundBuffer->loadFromFile("../assets/clicked.wav"))
     {
         std::cout << "Game: Failed to load asset 'clicked.wav'\n";
         std::exit(1);
@@ -329,7 +329,6 @@ void Gameplay::handleInput()
                 {
                     if (player.status == "alive")
                     {
-                        playClicked();
                         GameObject blockMouseOn = blockMouseIsOn();
                         if (blockMouseOn.arrIndexX != -1)
                         {
@@ -1083,8 +1082,7 @@ void Gameplay::calculatePlayerVelocity()
  */
 void Gameplay::updateSettingsStruct()
 {
-    std::fstream file("user_data/settings.csv", std::ios::out);
-    const char comma = ',';
+    std::fstream file("../user_data/settings.csv", std::ios::out);
     file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
     file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
     file << "DIFFICULTY, " << m_settings->difficulty << '\n';

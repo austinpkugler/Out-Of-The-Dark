@@ -51,7 +51,7 @@ void Menu::load()
     if (m_screenName == "title_screen")
     {
 
-        if (!m_backgroundTexture->loadFromFile("assets/title_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/title_screen_background.png"))
         {
             std::exit(1);
         }
@@ -59,25 +59,25 @@ void Menu::load()
     }
     else if (m_screenName == "play_screen")
     {
-        if (!m_backgroundTexture->loadFromFile("assets/play_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/play_screen_background.png"))
         {
             std::exit(1);
         }
     }
     else if (m_screenName == "settings_screen")
     {
-        if (!m_backgroundTexture->loadFromFile("assets/settings_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/settings_screen_background.png"))
         {
             std::exit(1);
         }
     }
 
-    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    if (!m_font.loadFromFile("../assets/rm_typerighter.ttf"))
     {
         std::exit(1);
     }
 
-    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    if (!m_soundBuffer->loadFromFile("../assets/clicked.wav"))
     {
         std::cout << "Game: Failed to load asset 'clicked.wav'\n";
         std::exit(1);
@@ -269,8 +269,7 @@ void Menu::renderPlayScreen()
  */
 void Menu::updateSettingsStruct()
 {
-    std::fstream file("user_data/settings.csv", std::ios::out);
-    const char comma = ',';
+    std::fstream file("../user_data/settings.csv", std::ios::out);
     file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
     file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
     file << "DIFFICULTY, " << m_settings->difficulty << '\n';
@@ -614,10 +613,10 @@ void Menu::loadFileToSaveSlot(int saveSlot)
         filePath = m_settings->saveSlot3;
     }
 
-    filePath = "python getMazeName/openFile.py " + filePath;
+    filePath = "python ../src/getMazeName/openFile.pyw " + filePath;
     
     system(filePath.c_str());
-    std::fstream file("getMazeName/filename.txt", std::ios::in);
+    std::fstream file("../src/getMazeName/filename.txt", std::ios::in);
     getline(file, filePath);
     file.close();
 

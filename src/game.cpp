@@ -46,12 +46,12 @@ Game::~Game()
 void Game::load()
 {
     loadSettingsStruct();
-    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    if (!m_font.loadFromFile("../assets/rm_typerighter.ttf"))
     {
         std::cout << "Game: Failed to load asset 'rm_typerighter.ttf'\n";
         std::exit(1);
     }
-    if (!m_music->openFromFile("assets/2nd_Sonata_Malign_Chords.ogg"))
+    if (!m_music->openFromFile("../assets/2nd_Sonata_Malign_Chords.ogg"))
     {
         std::cout << "Game: Failed to load asset '2nd_Sonata_Malign_Chords.ogg'\n";
         std::exit(1);
@@ -216,7 +216,7 @@ bool Game::isDone() const
  */
 void Game::loadSettingsStruct()
 {
-    std::fstream file("user_data/settings.csv", std::ios::in);
+    std::fstream file("../user_data/settings.csv", std::ios::in);
     char space;
     std::string parameterName;
 

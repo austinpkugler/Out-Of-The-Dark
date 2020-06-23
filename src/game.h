@@ -7,7 +7,6 @@
 #include <fstream>
 #include <cstdio>
 #include <iostream>
-#include <windows.h>
 
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"

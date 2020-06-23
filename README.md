@@ -1,27 +1,26 @@
 # Out of the Dark
 ## Description
-Find your way out. Any means necessary. Play the default levels found in /levels, or create your own with the built in maze editor. 
+Find your way out. Any means necessary. Play the default levels found in /levels, or create your own with the built in maze editor. More information can be found in the Official Player Guide found in the root directory. 
 
-## How to run the game
-1. Download Mingw and SFML (go find an online tutorial, its a complicated process)
+## Before you run the game
+Please note that there is a Python 3.6+ dependency. This game requires that the tkinter library for Python is installed (it is installed by default), and that the location of Python is added as an environment variable. This is needed because the C++ files invocate a Python script by doing a system call similar to  `system("Python path/to/pyFile.py arg1 arg2")`
 
-2. Download Python 3.6 or greater and add it to PATH if you have not already
+## Running the game
+### Windows
+1. Navigate to the windows-binary subdirectory
+2. Launch the game by opening main.exe.
+3. Enjoy the game!
 
-3. Download this repository
+### Linux/Mac
+1. You will have to compile all .cpp files in /src and run it yourself.
+2. If you are unsure on how to do this, look up videos on installing SFML and compiling SFML projects on Linux/Mac
 
-4. Navigate to the SFML\bin directory, copy all .dll or .lib files, and paste them in the root directory of this repository
 
-5. Open a terminal in the root directory, and type in `g++ -std=c++11 main.cpp game.cpp gameplay.cpp mazeBuilder.cpp menu.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio` NOTE: replace the C:/sfml file paths with the file path where it is installed on your system
-6. Type `.\main.exe` into the console, and enjoy the game
 
-We realize this is troublesome for people who are just looking to play the game, and are working on a simple installer to help with this process.
+## Suggestions?
+Feel free to contact one of the creators listed below, or submit a pull request or issue on Github.
 
 ## Creators
 Hayden Carroll
 
-- Preferred Contact Info: haydencarroll77@gmail.com
-
 Austin Kugler
-
-- Preferred Contact Info: austinpkugler@gmail.com
-

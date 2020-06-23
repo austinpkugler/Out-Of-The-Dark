@@ -1,5 +1,0 @@
-add some animations
-add some sound on button clicks
-add an installer on github using Advanced installer
-create more blocks
-make youtube video

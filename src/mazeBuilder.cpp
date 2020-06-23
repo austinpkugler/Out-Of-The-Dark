@@ -81,13 +81,13 @@ MazeBuilder::~MazeBuilder()
  */
 void MazeBuilder::load()
 {
-    if (!m_backgroundTexture->loadFromFile("assets/maze_builder_background.png"))
+    if (!m_backgroundTexture->loadFromFile("../assets/maze_builder_background.png"))
     {
         std::exit(1);   
     }
     m_backgroundSprite.setTexture(*m_backgroundTexture);
 
-    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    if (!m_font.loadFromFile("../assets/rm_typerighter.ttf"))
     {
         std::exit(1);
     }
@@ -103,39 +103,39 @@ void MazeBuilder::load()
         m_textures.push_back(new sf::Texture());
     }
 
-    if (!m_textures[0]->loadFromFile("assets/blue_floor_texture.png"))
+    if (!m_textures[0]->loadFromFile("../assets/blue_floor_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[1]->loadFromFile("assets/blue_floor_trapped_texture.png"))
+    if (!m_textures[1]->loadFromFile("../assets/blue_floor_trapped_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[2]->loadFromFile("assets/blue_floor_fire_texture.png"))
+    if (!m_textures[2]->loadFromFile("../assets/blue_floor_fire_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[3]->loadFromFile("assets/death_texture.png"))
+    if (!m_textures[3]->loadFromFile("../assets/death_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[4]->loadFromFile("assets/wall_texture.png"))
+    if (!m_textures[4]->loadFromFile("../assets/wall_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[5]->loadFromFile("assets/alien_texture.png"))
+    if (!m_textures[5]->loadFromFile("../assets/alien_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[6]->loadFromFile("assets/start_texture.png"))
+    if (!m_textures[6]->loadFromFile("../assets/start_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[7]->loadFromFile("assets/end_texture.png"))
+    if (!m_textures[7]->loadFromFile("../assets/end_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_soundBuffer->loadFromFile("assets/clicked.wav"))
+    if (!m_soundBuffer->loadFromFile("../assets/clicked.wav"))
     {
         std::cout << "Game: Failed to load asset 'clicked.wav'\n";
         std::exit(1);
@@ -440,14 +440,14 @@ void MazeBuilder::generateFile()
 {
     if (m_mazeFileName == "") // if there isnt a fileName, dont have recommended name
     {
-        m_mazeFileName = "python getMazeName/saveAs.py";
+        m_mazeFileName = "python ../src/getMazeName/saveAs.pyw";
     }
     else // otherwise do have recommended name
     {
-        m_mazeFileName = "python getMazeName/saveAs.py \"" + m_mazeFileName + "\"";
+        m_mazeFileName = "python ../src/getMazeName/saveAs.pyw \"" + m_mazeFileName + "\"";
     }
     system(m_mazeFileName.c_str()); // get filename to save as
-    std::fstream file("getMazeName/filename.txt");
+    std::fstream file("../src/getMazeName/filename.txt");
     std::getline(file, m_mazeFileName);
     file.close();
 
@@ -475,9 +475,9 @@ void MazeBuilder::generateFile()
 void MazeBuilder::loadFromFile()
 {
     // opens file using python tkinter
-    system("python getMazeName/openFile.py");
+    system("python ../src/getMazeName/openFile.pyw");
 
-    std::fstream file("getMazeName/filename.txt", std::ios::in);
+    std::fstream file("../src/getMazeName/filename.txt", std::ios::in);
     getline(file, m_mazeFileName);
     file.close();
 
