@@ -14,7 +14,8 @@
  * @param width - a float containing the starting width of the game window.
  * @param height - a float containing the starting height of the game window.
  */
-Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height)
+Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings,
+           std::shared_ptr<sf::Music> music, float width, float height)
 {
     m_window = window;
     m_settings = settings;
@@ -22,10 +23,11 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
     m_width = width;
     m_height = height;
     m_screenName = "title_screen";
-    m_sectionName = "menu";
-    m_backgroundTexture = new sf::Texture();
-    m_soundBuffer = new sf::SoundBuffer();
+    m_sectionName = SectionName::Menu;
+    m_backgroundTexture = std::make_unique<sf::Texture>();
+    m_soundBuffer = std::make_unique<sf::SoundBuffer>();
     load();
+
 }
 
 /**
@@ -34,7 +36,6 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
  */
 Menu::~Menu()
 {
-    delete m_backgroundTexture;
 }
 
 /**
@@ -77,12 +78,7 @@ void Menu::load()
         std::exit(1);
     }
 
-    if (!m_soundBuffer->loadFromFile("../assets/clicked.wav"))
-    {
-        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
-        std::exit(1);
-    }
-    m_sound.setBuffer(*m_soundBuffer);
+    loadSound();
 
     m_backgroundSprite.setTexture(*m_backgroundTexture);
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
@@ -278,7 +274,6 @@ void Menu::updateSettingsStruct()
     file << "SAVESLOT_1, " << m_settings->saveSlot1 << '\n';
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
-    file.close();
 }
 
 /**
@@ -329,7 +324,7 @@ void Menu::titleScreenInput()
                     {
                         // std::cout << "Menu: 'Maze builder' button pressed\n";
                         playClicked();
-                        m_sectionName = "maze_builder";
+                        m_sectionName = SectionName::MazeBuilder;
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.6)
@@ -374,19 +369,19 @@ void Menu::playScreenInput()
                         event.mouseButton.x <= width * 0.31)
                     {
                         // std::cout << "Menu: 'Save Slot 1' button pressed\n";
-                        m_sectionName = "save_slot_1";
+                        m_sectionName = SectionName::SaveSlot1;
                     }
                     else if (event.mouseButton.x >= width * 0.39 &&
                              event.mouseButton.x <= width * 0.61)
                     {
                         // std::cout << "Menu: 'Save Slot 2' button pressed\n";
-                        m_sectionName = "save_slot_2";
+                        m_sectionName = SectionName::SaveSlot2;
                     }
                     else if (event.mouseButton.x >= width * 0.69 &&
                              event.mouseButton.x <= width * 0.91)
                     {
                         // std::cout << "Menu: 'Save Slot 3' button pressed\n";
-                        m_sectionName = "save_slot_3";
+                        m_sectionName = SectionName::SaveSlot3;
                     }
                 }
                 if (event.mouseButton.y >= height * 0.75 &&
@@ -618,7 +613,6 @@ void Menu::loadFileToSaveSlot(int saveSlot)
     system(filePath.c_str());
     std::fstream file("../src/getMazeName/filename.txt", std::ios::in);
     getline(file, filePath);
-    file.close();
 
     if (saveSlot == 1)
     {

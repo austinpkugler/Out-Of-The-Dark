@@ -1,8 +1,9 @@
 // Included Graphics Library Dependencies
-#include "SFML/Graphics.hpp"
-
-// Included Local Dependencies
+#include <SFML/Graphics.hpp>
+#include <memory>
 #include "game.h"
+#include <iostream>
+
 
 /**
  * @brief Creates the game and contains the game loop.
@@ -10,18 +11,16 @@
  * continuously calls the required functions to continue to accurately display
  * the game, until the game loop has ended. The entire game and all of the main
  * function's dependencies can be compiled by entering:
- * g++ -std=c++11 main.cpp game.cpp menu.cpp mazeBuilder.cpp gameplay.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+ * g++ -std=c++14 main.cpp game.cpp menu.cpp mazeBuilder.cpp gameplay.cpp -o main.exe -LC:/sfml/lib/ -IC:/sfml/include/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
  * @throw SFML exceptions may be thrown during fatal errors.
  * @param None
  * @return None
  */
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1000, 600), "Out of the Dark");
-    sf::Clock clock;
-    Game game(&window);
-    sf::Time time;
-    int fps = 0;
+    std::shared_ptr<sf::RenderWindow> window = std::make_shared<sf::RenderWindow>(sf::VideoMode(1000, 600), "Out of the Dark");
+    Game game(window);
+    
 
     while(!game.isDone())
     {
@@ -29,13 +28,7 @@ int main()
         game.handleInput();
         game.update();
         game.render();
-        window.display();
-
-        // Calculate and store FPS
-        time = clock.getElapsedTime();
-        fps = 1.0f / time.asSeconds();
-        game.setFps(fps);
-        clock.restart().asSeconds();
+        window->display();
     }
 
     return 0;

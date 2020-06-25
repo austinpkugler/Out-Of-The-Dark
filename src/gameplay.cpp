@@ -19,7 +19,8 @@
  * @param saveSlot - an integer that contains the current save slot being
  * played between 1-3.
  */
-Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot)
+Gameplay::Gameplay(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings, 
+                   std::shared_ptr<sf::Music> music, float width, float height, std::string fileName, int saveSlot) : vectorOfTextures(8)
 {
     m_window = window;
     m_settings = settings;
@@ -34,23 +35,25 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     player.velocity.y = 0;
     m_screenName = "game_screen";
 
-    deathScreenTexture = new sf::Texture();
-    hardModeTexture = new sf::Texture();
-    pausedScreenTexture = new sf::Texture();
-    settingsScreenTexture = new sf::Texture();
-    winScreenTexture = new sf::Texture();
+
+
+    deathScreenTexture = std::make_unique<sf::Texture>();
+    hardModeTexture = std::make_unique<sf::Texture>();
+    pausedScreenTexture = std::make_unique<sf::Texture>();
+    settingsScreenTexture = std::make_unique<sf::Texture>();;
+    winScreenTexture = std::make_unique<sf::Texture>();
 
     if (saveSlot == 1)
     {
-        m_sectionName = "save_slot_1";
+        m_sectionName = SectionName::SaveSlot1;
     }
     else if (saveSlot == 2)
     {
-        m_sectionName = "save_slot_2";
+        m_sectionName = SectionName::SaveSlot2;
     }
     else if (saveSlot == 3)
     {
-        m_sectionName = "save_slot_3";
+        m_sectionName = SectionName::SaveSlot3;
     }
 
 
@@ -64,6 +67,7 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     healthBar.setSize(sf::Vector2f(0.15 * m_width, 0.01 * height));
     healthBar.setFillColor(sf::Color(0, 128, 0));
     healthBar.setPosition(squareSize, 0.93 * m_height);
+
 
     load();
 
@@ -89,17 +93,6 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
  */
 Gameplay::~Gameplay()
 {
-    delete deathScreenTexture;
-    delete hardModeTexture;
-    delete pausedScreenTexture;
-    delete settingsScreenTexture;
-    delete player.texturePtr;
-    delete winScreenTexture;
-    delete player.texturePtr;
-    for (int i = 0; i < 8; i++)
-    {
-        delete vectorOfTextures[i];
-    }
 }
 
 /**
@@ -115,9 +108,10 @@ Gameplay::~Gameplay()
  */
 void Gameplay::load()
 {
-    for (int i = 0; i < 8; i++)
+
+    for (unsigned int i=0; i < vectorOfTextures.size(); ++i)
     {
-        vectorOfTextures.push_back(new sf::Texture());
+        vectorOfTextures[i] = std::make_unique<sf::Texture>();
     }
 
     if (!vectorOfTextures[0]->loadFromFile("../assets/blue_floor_texture.png"))
@@ -190,12 +184,8 @@ void Gameplay::load()
         std::cout << "Gameplay: Failed to load asset 'win_background.png'\n";
         std::exit(1);
     }
-    if (!m_soundBuffer->loadFromFile("../assets/clicked.wav"))
-    {
-        std::cout << "Game: Failed to load asset 'clicked.wav'\n";
-        std::exit(1);
-    }
-    m_sound.setBuffer(*m_soundBuffer);
+    loadSound();
+
     player.sprite.setTexture(*player.texturePtr);
     player.sprite.setScale((squareSize / 240.0f) * 0.7, (squareSize / 240.0f) * 0.7);
     player.sprite.setOrigin(player.sprite.getLocalBounds().width / 2, player.sprite.getLocalBounds().height / 2);
@@ -259,17 +249,18 @@ void Gameplay::update()
 
         if (playerWon())
         {
-            player.status = "won";
+            player.status = Player::Won;
         }
 
 
         m_squareToMoveTo.move(player.velocity.x, player.velocity.y);
 
-        GameObject blockMouseOn = blockMouseIsOn();
-        if (blockMouseOn.arrIndexX != -1)
+        std::optional<GameObject> blockMouseOn = blockMouseIsOn();
+
+        if (blockMouseOn)
         {
-            m_highlightedGridRect.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
-                                            (blockMouseOn.arrIndexY - upperLeftSquare.y)*squareSize + gridOffset.y);
+            m_highlightedGridRect.setPosition((blockMouseOn->arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
+                                            (blockMouseOn->arrIndexY - upperLeftSquare.y)*squareSize + gridOffset.y);
                                             
         }
         if (gridOffset.x >= squareSize)
@@ -327,16 +318,16 @@ void Gameplay::handleInput()
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    if (player.status == "alive")
+                    if (player.status == Player::Alive)
                     {
-                        GameObject blockMouseOn = blockMouseIsOn();
-                        if (blockMouseOn.arrIndexX != -1)
+                        std::optional<GameObject> blockMouseOn = blockMouseIsOn();
+                        if (blockMouseOn)
                         {
-                            m_squareToMoveTo.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x,
-                                                        (blockMouseOn.arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
+                            m_squareToMoveTo.setPosition((blockMouseOn->arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x,
+                                                        (blockMouseOn->arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
                         }
                     }
-                    else if (player.status == "dead" || player.status == "won")
+                    else if (player.status == Player::Dead || player.status == Player::Won)
                     {
                         resetLevel();
                     }
@@ -375,13 +366,13 @@ void Gameplay::render()
     if (m_screenName == "game_screen")
     {
         renderGrid();
-        if (player.status == "alive")
+        if (player.status == Player::Alive)
         {
             if (m_squareToMoveTo.getPosition().x != -1)
             {
                 m_window->draw(m_squareToMoveTo);
             }
-            if (blockMouseIsOn().arrIndexX != -1)
+            if (blockMouseIsOn())
             {
                 m_window->draw(m_highlightedGridRect);
             }
@@ -395,11 +386,11 @@ void Gameplay::render()
                 m_window->draw(hardModeSprite);
             }
         }
-        else if (player.status == "dead")
+        else if (player.status == Player::Dead)
         {
             m_window->draw(deathScreenSprite);
         }
-        else if (player.status == "won")
+        else if (player.status == Player::Won)
         {
             m_window->draw(winScreenSprite);
         }
@@ -527,7 +518,7 @@ void Gameplay::calculateCollision()
     if (player.healthPercent <= 0)
     {
         player.healthPercent = 0;
-        player.status = "dead";
+        player.status = Player::Dead;
     }
 }
 
@@ -588,7 +579,6 @@ void Gameplay::populateGrid()
             };
         }
     }
-    file.close();
 }
 
 /**
@@ -662,7 +652,7 @@ void Gameplay::resetLevel()
     m_squareToMoveTo.setPosition(-1, -1);
 
     player.healthPercent = 100;
-    player.status = "alive";
+    player.status = Player::Alive;
     populateGrid();
 }
 
@@ -675,7 +665,7 @@ void Gameplay::resetLevel()
  * @param None
  * @return m_maze[x][y] - an instance of the GameObject struct.
  */
-const GameObject Gameplay::blockMouseIsOn() const
+std::optional<GameObject> Gameplay::blockMouseIsOn() const
 {
     // scales the position of the mouse to m_width & m_height, since everything else is in terms of m_width and m_height
     float mouseX = sf::Mouse::getPosition(*m_window).x;
@@ -690,7 +680,7 @@ const GameObject Gameplay::blockMouseIsOn() const
     int y = ((mouseY - gridOffset.y) / squareSize) + upperLeftSquare.y;
     if (x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)
     {
-        return GameObject();
+        return std::nullopt;
     }
     return m_maze[x][y];
 }
@@ -803,7 +793,7 @@ void Gameplay::pausedScreenInput()
                     {
                         // std::cout << "Gameplay: 'Main Menu' button pressed\n";
                         playClicked();
-                        m_sectionName = "menu";
+                        m_sectionName = SectionName::Menu;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
@@ -1092,5 +1082,4 @@ void Gameplay::updateSettingsStruct()
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
     m_window->setFramerateLimit(m_settings->frameRate);
-    file.close();
 }

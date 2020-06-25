@@ -8,16 +8,16 @@
  * @param window - a pointer to an sf::RenderWindow instance. This is the base
  * frame of the game.
  */
-Game::Game(sf::RenderWindow* window)
+Game::Game(std::shared_ptr<sf::RenderWindow> window) : 
+m_window(window),
+m_width(m_window->getSize().x),
+m_height(m_window->getSize().y),
+m_settings(std::make_shared<Settings>()),
+m_music(std::make_shared<sf::Music>()),
+m_sectionName(SectionName::Menu)
 {
-    m_window = window;
-    m_width = m_window->getSize().x;
-    m_height = m_window->getSize().y;
-    m_settings = new Settings();
-    m_music = new sf::Music();
+    m_section = std::make_unique<Menu>(m_window, m_settings, m_music, m_width, m_height);
     load();
-    m_section = new Menu(m_window, m_settings, m_music, m_width, m_height);
-    m_sectionName = "maze_builder";
     m_window->setFramerateLimit(m_settings->frameRate);
 }
 
@@ -29,11 +29,7 @@ Game::Game(sf::RenderWindow* window)
  */
 Game::~Game()
 {
-    delete m_settings;
-    delete m_section;
-    delete m_music;
 }
-
 /**
  * @brief Manages the loading of all Game assets.
  * @details Loads global assets and then calls specific load functions
@@ -82,28 +78,31 @@ void Game::update()
     if (m_sectionName != m_section->getSectionName() && m_section->soundStatus() != sf::Sound::Status::Playing)
     {
         m_sectionName = m_section->getSectionName();
-        delete m_section;
-        if (m_sectionName == "menu")
+        if (m_sectionName == SectionName::Menu)
         {
-            m_section = new Menu(m_window, m_settings, m_music, m_width, m_height);
+            m_section = std::make_unique<Menu>(m_window, m_settings, m_music, m_width, m_height);
         }
-        else if (m_sectionName == "maze_builder")
+        else if (m_sectionName == SectionName::MazeBuilder)
         {
-            m_section = new MazeBuilder(m_window, m_settings, m_width, m_height);
+            m_section = std::make_unique<MazeBuilder>(m_window, m_settings, m_width, m_height);
         }
-        else if (m_sectionName == "save_slot_1")
+        else if (m_sectionName == SectionName::SaveSlot1)
         {
-            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot1, 1);
+            m_section = std::make_unique<Gameplay>(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot1, 1);
         }
-        else if (m_sectionName == "save_slot_2")
+        else if (m_sectionName == SectionName::SaveSlot2)
         {
-            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot2, 2);
+            m_section = std::make_unique<Gameplay>(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot2, 2);
         }
-        else if (m_sectionName == "save_slot_3")
+        else if (m_sectionName == SectionName::SaveSlot3)
         {
-            m_section = new Gameplay(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot3, 3);
+            m_section = std::make_unique<Gameplay>(m_window, m_settings, m_music, m_width, m_height, m_settings->saveSlot3, 3);
         }
     }
+
+    // Calculate FPS and reset clock
+    m_fps = 1.0f / m_clock.getElapsedTime().asSeconds();
+    m_clock.restart();
 }
 
 /**
@@ -132,22 +131,26 @@ void Game::handleInput()
 void Game::render()
 {
     m_section->render();
-    if (m_settings->showFps && m_frameCount % (m_settings->frameRate / 4) == 0)
-    {
-        m_displayedFps = m_fps;
-        if (m_displayedFps > m_settings->frameRate)
-        {
-            m_displayedFps = m_settings->frameRate;
-        }
-    }
+
     if (m_settings->showFps)
     {
+        // Updates the displayed FPS every quarter second
+        if (m_frameCount % (m_settings->frameRate / 4) == 0)
+        {
+            m_displayedFps = m_fps;
+            if (m_displayedFps > m_settings->frameRate)
+            {
+                m_displayedFps = m_settings->frameRate;
+            }
+        }
         sf::Text text;
         text.setFont(m_font);
-        char c[10];
-        sprintf(c, "%i", m_displayedFps);
-        text.setString(c);
-        text.setPosition(15, -15);
+
+        std::string fpsString;
+        fpsString = std::to_string(m_displayedFps);
+        text.setString(fpsString);
+
+        text.setPosition(15, -15); // position fps at top left of screen
         m_window->draw(text);
     }
     m_frameCount++;
@@ -166,33 +169,6 @@ void Game::clearScreen()
     m_window->clear(sf::Color::Black);
 }
 
-/**
- * @brief Getter function for the current FPS being displayed.
- * @details The value of m_fps is not the maximum FPS, but rather the FPS
- * currently being displayed. For example, the max FPS may be 120, but the
- * value returned by getFps() is 113.
- * @throw None
- * @param None
- * @return m_fps - the FPS being displayed at the time of function call.
- */
-int Game::getFps() const
-{
-    return m_fps;
-}
-
-/**
- * @brief Updates the current FPS with the newest value, calculated in main().
- * @details The current FPS is re-calculated each frame in main() and this
- * setter function is used to update the m_fps Game member variable with the
- * new value.
- * @throw None
- * @param None
- * @return None
- */
-void Game::setFps(unsigned int fps)
-{
-    m_fps = fps;
-}
 
 /**
  * @brief Getter for the current status of the game.
@@ -207,8 +183,8 @@ bool Game::isDone() const
 }
 
 /**
- * @brief Loads the settings from a .csv file.
- * @details Setting preferences are loaded from an external .csv file into the
+ * @brief Loads the settings from a .ini file.
+ * @details Setting preferences are loaded from an external .ini file into the
  * m_settings struct.
  * @throw None
  * @param None
@@ -234,6 +210,4 @@ void Game::loadSettingsStruct()
     file >> parameterName;
     file.get(space);
     getline(file, m_settings->saveSlot3);
-
-    file.close();
 }

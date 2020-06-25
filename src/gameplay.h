@@ -24,7 +24,7 @@
  */
 struct Player
 {
-    std::string status = "alive";
+    enum {Alive, Dead, Won} status = Alive;
     bool burning = false;
     bool poisoned = false;
     float healthPercent = 100;
@@ -33,8 +33,9 @@ struct Player
     unsigned int x = 0; // In terms of pixels
     unsigned int y = 0; // In terms of pixels
     sf::Sprite sprite;
-    sf::Texture* texturePtr = new sf::Texture();
+    std::unique_ptr<sf::Texture> texturePtr = std::make_unique<sf::Texture>();
     sf::Vector2f velocity = sf::Vector2f(0, 0);
+
 };
 
 /**
@@ -49,7 +50,7 @@ struct GameObject
     int arrIndexX = -1;
     int arrIndexY = -1;
     int textureIndex = 4;
-    bool walkable = 0;
+    bool walkable = false;
     sf::Sprite sprite;
 };
 
@@ -66,8 +67,13 @@ class Gameplay: public Section
 {
 public:
     // Constructor and Destructor
-    Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot);
+    Gameplay(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings, 
+             std::shared_ptr<sf::Music> music, float width, float height, std::string fileName, int saveSlot);
     ~Gameplay();
+    Gameplay(const Gameplay&) = delete;            // copy constructor
+    Gameplay(Gameplay&&) = delete;                 // move constructor
+    Gameplay& operator=(const Gameplay&) = delete; // copy assignment
+    Gameplay& operator=(Gameplay&&) = delete;      // move assignment
 
     // Public Member Functions for General Gameplay Processes
     virtual void load();            // Manages the loading of all Gameplay assets.
@@ -83,7 +89,7 @@ private:
     void renderGrid();              // Renders the maze, including a layer of blocks the user cannot see around the screen
     bool playerWon();               // Returns a boolean indicating whether the player has won.
     void resetLevel();              // Resets the level to its original form.
-    const GameObject blockMouseIsOn() const;                            // Calculates and returns the grid data of the mouse position.
+    std::optional<GameObject> blockMouseIsOn() const;                   // Calculates and returns the grid data of the mouse position.
     sf::Vector2f indexToCoord(unsigned int x, unsigned int y) const;    // Converts indices of the grid array to an sf::Vector2f.
     std::vector<GameObject> blocksPlayerIsOn() const;                   // Calculates collision and returns a vector of squares the player is currently on.
     void pausedScreenInput();           // Deals with input for the ingame settings (when Escape is pressed).
@@ -98,21 +104,21 @@ private:
     sf::RectangleShape healthBarBg;
     sf::RectangleShape m_highlightedGridRect;
     sf::RectangleShape m_squareToMoveTo;
-    sf::Texture* deathScreenTexture;
+    std::unique_ptr<sf::Texture> deathScreenTexture;
     sf::Sprite deathScreenSprite;
-    sf::Texture* hardModeTexture;
+    std::unique_ptr<sf::Texture> hardModeTexture;
     sf::Sprite hardModeSprite;
-    sf::Texture* pausedScreenTexture;
+    std::unique_ptr<sf::Texture> pausedScreenTexture;
     sf::Sprite pausedScreenSprite;
-    sf::Texture* settingsScreenTexture;
+    std::unique_ptr<sf::Texture> settingsScreenTexture;
     sf::Sprite winScreenSprite;
-    sf::Texture* winScreenTexture;
+    std::unique_ptr<sf::Texture> winScreenTexture;
     sf::Sprite settingsScreenSprite;
     sf::Vector2i upperLeftSquare;
     sf::Vector2i startingBlock;
     sf::Vector2f gridOffset;
-    std::vector<sf::Texture*> vectorOfTextures;
-    sf::Music* m_music;
+    std::vector<std::unique_ptr<sf::Texture>> vectorOfTextures;
+    std::shared_ptr<sf::Music> m_music;
 
     std::vector<std::vector<GameObject>> m_maze;
     std::string fileName;

@@ -8,6 +8,7 @@
                 "_UNICODE"
             ],
             "cStandard": "c11",
+            "cppStandard": "c++17",
             "intelliSenseMode": "clang-x86",
             "compilerPath": "C:/MingW/bin/g++.exe",
             "includePath": [
