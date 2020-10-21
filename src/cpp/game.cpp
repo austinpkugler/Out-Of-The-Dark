@@ -53,7 +53,8 @@ void Game::load()
         std::exit(1);
     }
     
-    m_music->setVolume(20.f);
+
+    m_music->setVolume(20.0f);
     m_music->setLoop(true);
 
     if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)

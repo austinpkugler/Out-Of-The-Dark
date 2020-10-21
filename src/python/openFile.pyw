@@ -10,5 +10,5 @@ try: # if the c++ system() call had an argument for the script
 except IndexError:
     pass
 file_path = filedialog.askopenfilename(defaultextension=".maze", filetypes=(("MAZE file", "*.maze"),), initialfile=recommended_filename)
-with open("../src/getMazeName/filename.txt", 'w') as file:
+with open("../src/python/filename.txt", 'w') as file:
     file.write(file_path)

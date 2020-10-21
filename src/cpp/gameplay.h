@@ -10,7 +10,7 @@
 #include <cmath>
 
 // Included Graphics Library Dependencies
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 
 // Included Local Dependencies
 #include "section.h"

@@ -608,10 +608,10 @@ void Menu::loadFileToSaveSlot(int saveSlot)
         filePath = m_settings->saveSlot3;
     }
 
-    filePath = "python ../src/getMazeName/openFile.pyw " + filePath;
+    filePath = "python3 ../src/python/openFile.pyw " + filePath;
     
     system(filePath.c_str());
-    std::fstream file("../src/getMazeName/filename.txt", std::ios::in);
+    std::fstream file("../src/python/filename.txt", std::ios::in);
     getline(file, filePath);
 
     if (saveSlot == 1)

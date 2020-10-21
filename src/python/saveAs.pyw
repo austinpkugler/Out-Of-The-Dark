@@ -11,5 +11,5 @@ try:
 except IndexError:
     pass
 file_name = filedialog.asksaveasfilename(defaultextension=".maze", filetypes=(("MAZE file", ".maze"),), initialfile=recommended_filename)
-with open("../src/getMazeName/filename.txt", 'w') as file:
+with open("../src/python/filename.txt", 'w') as file:
     file.write(file_name)

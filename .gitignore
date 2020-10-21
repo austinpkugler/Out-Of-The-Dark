@@ -1,0 +1,8 @@
+*.exe
+*.o
+build/
+Makefile
+OutOfTheDark
+.vscode/
+settings.csv
+vscode/

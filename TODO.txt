@@ -6,8 +6,7 @@ Small Additions:
 3.  dont use random numbers, use constants with variable names throughout code
 4.  get rid of new/delete and make smart pointers throughout code
 5.  follow the rule of 5/0 design for constructor destructor copy constructor move ....
-6.  if i use multiple languages, separate folder by language
-7.  "You have personal information in filename.txt, if you have secrets like 
+6.  "You have personal information in filename.txt, if you have secrets like 
     passwords or personal information, they should be in uncommitted settings files
     that the user is instructed to create, or in environment variables the user is
     asked to set up."
@@ -16,9 +15,8 @@ Small Additions:
 Large Additions:
 ----------------
 1.  consider using a c++ gui
-2.  use and learn CMake
-3.  create some code that can be used to create your own library
-4.  create an installer for the project
-5.  readme to include build/compile isntructions
-6.  take out .vscode and windows-binary folders. use github releases instead
+2.  create some code that can be used to create your own library
+3.  create an installer for the project
+4.  readme to include build/compile isntructions
+5.  take out .vscode and windows-binary folders. use github releases instead
 
