@@ -1,5 +1,6 @@
 #include "gameplay.h"
 
+
 /**
  * @brief Gameplay class constructor
  * @details Initializes the variables required for running ingame attributes,
@@ -87,6 +88,7 @@ Gameplay::Gameplay(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Set
     m_squareToMoveTo.setPosition(-1, -1);
 }
 
+
 /**
  * @brief Destructor for the Gameplay class.
  * @details Deletes the allocated memory for all game textures.
@@ -94,6 +96,7 @@ Gameplay::Gameplay(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Set
 Gameplay::~Gameplay()
 {
 }
+
 
 /**
  * @brief Manages the loading of all Gameplay assets.
@@ -208,6 +211,7 @@ void Gameplay::load()
     populateGrid();
 }
 
+
 /**
  * @brief Rotates the player sprite to look towards where the mouse is
  * @details changes the absolute rotation of the player sprite so it looks where
@@ -228,6 +232,7 @@ void Gameplay::rotatePlayerToMouse()
                                 mouseCoords.y - player.y);
     player.sprite.setRotation(rotation*-180/pi);
 }
+
 
 /**
  * @brief Updates all gameplay variables based on events that occur.
@@ -287,6 +292,7 @@ void Gameplay::update()
         gridOffset.y += player.velocity.y;
     }
 }
+
 
 /**
  * @brief Manages Gameplay input during game playthrough.
@@ -352,6 +358,7 @@ void Gameplay::handleInput()
     }
 }
 
+
 /**
  * @brief Displays all Gameplay assets to the screen.
  * @details The player sprite, grid textures, and overlays are displayed. This
@@ -406,6 +413,7 @@ void Gameplay::render()
     }
 }
 
+
 /**
  * @brief Graphically displays the player's health bar.
  * @details A red background health bar is always present behind a green health
@@ -421,6 +429,7 @@ void Gameplay::displayHealth()
     m_window->draw(healthBarBg);
     m_window->draw(healthBar);
 }
+
 
 /**
  * @brief Calculates player related collision and applies damage if applicable
@@ -522,6 +531,7 @@ void Gameplay::calculateCollision()
     }
 }
 
+
 /**
  * @brief Creates a 2d vector of GameObjects for the maze from a given file
  * @details Opens a fstream object with member variable fileName as the file name.
@@ -581,6 +591,7 @@ void Gameplay::populateGrid()
     }
 }
 
+
 /**
  * @brief Renders the maze, including a layer of blocks the user cannot see around the screen
  * @details Loops through upper left corner of the maze - 1 (so when the offset is reached, the square is rendered)
@@ -608,6 +619,7 @@ void Gameplay::renderGrid()
     }
 }
 
+
 /**
  * @brief Returns a boolean indicating whether the player has won.
  * @details Checks the texture the player is standing on to determine if it is
@@ -628,6 +640,7 @@ bool Gameplay::playerWon()
     }
     return false;
 }
+
 
 /**
  * @brief Resets the level to its original form.
@@ -655,6 +668,7 @@ void Gameplay::resetLevel()
     player.status = Player::Alive;
     populateGrid();
 }
+
 
 /**
  * @brief Calculates and returns the grid data of the mouse position.
@@ -685,6 +699,7 @@ std::optional<GameObject> Gameplay::blockMouseIsOn() const
     return m_maze[x][y];
 }
 
+
 /**
  * @brief Converts indices of the grid array to an sf::Vector2f.
  * @details Passed x and y indices are used to calculate their equivalent
@@ -698,6 +713,7 @@ sf::Vector2f Gameplay::indexToCoord(unsigned int x, unsigned int y) const
 {
     return sf::Vector2f((x - upperLeftSquare.x) * squareSize + gridOffset.x, (y - upperLeftSquare.y) * squareSize + gridOffset.y);
 }
+
 
 /**
  * @brief Calculates collision and returns a vector of squares the player is currently on.
@@ -752,6 +768,7 @@ std::vector<GameObject> Gameplay::blocksPlayerIsOn() const
     }
     return blocks;
 }
+
 
 /**
  * @brief Deals with input for the ingame settings (when Escape is pressed).
@@ -814,6 +831,7 @@ void Gameplay::pausedScreenInput()
         }
     }
 }
+
 
 /**
  * @brief Deals with input if the current screen is settings_screen.
@@ -957,6 +975,7 @@ void Gameplay::settingsScreenInput()
     }
 }
 
+
 /**
  * @brief Renders in game settings screen.
  * @details Creates a rectangle and displays it on each setting, if that setting is True.
@@ -1033,6 +1052,7 @@ void Gameplay::renderSettingsScreen()
     }
 }
 
+
 /**
  * @brief Calculates the player velocity based on the distance to the selected square (m_squareToMoveTo).
  * @details Calculates the distance on the x axis  and the y axis etween the player coordinates and m_squareToMoveTo.
@@ -1062,6 +1082,7 @@ void Gameplay::calculatePlayerVelocity()
     player.velocity.y = (-2*squareSize * y_distance / total_distance) / m_settings->frameRate;
 }
 
+
 /**
  * @brief Loads the current settings to settings.csv.
  * @details An fstream file opens user_data/settings.csv, where the contents are
@@ -1083,3 +1104,4 @@ void Gameplay::updateSettingsStruct()
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
     m_window->setFramerateLimit(m_settings->frameRate);
 }
+

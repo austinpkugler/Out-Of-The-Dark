@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import sys
 
+
 root = tk.Tk()
 root.withdraw()
 recommended_filename = ""
@@ -12,3 +13,4 @@ except IndexError:
 file_path = filedialog.askopenfilename(defaultextension=".maze", filetypes=(("MAZE file", "*.maze"),), initialfile=recommended_filename)
 with open("../src/python/filename.txt", 'w') as file:
     file.write(file_path)
+

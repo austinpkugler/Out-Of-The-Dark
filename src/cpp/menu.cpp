@@ -1,5 +1,6 @@
 #include "menu.h"
 
+
 /**
  * @brief Menu class constructor
  * @details Initializes the varials required for running the launch menu.
@@ -30,6 +31,7 @@ Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> s
 
 }
 
+
 /**
  * @brief Destructor for the Menu class.
  * @details Deletes the allocated memory for all game textures.
@@ -37,6 +39,7 @@ Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> s
 Menu::~Menu()
 {
 }
+
 
 /**
  * @brief Manages the loading of all Menu assets.
@@ -100,6 +103,7 @@ void Menu::load()
     m_saveSlot3Text.setPosition(0.76 * m_width, 0.5 * m_height);
 }
 
+
 /**
  * @brief Dummy function for updating the Menu.
  * @details No updating is needed for the Menus, but as a child of Section the
@@ -111,6 +115,7 @@ void Menu::load()
 void Menu::update()
 {
 }
+
 
 /**
  * @brief Manages Menu input and calls the relevant input handler.
@@ -135,6 +140,7 @@ void Menu::handleInput()
     }
 }
 
+
 /**
  * @brief Displays all Menu assets to the screen.
  * @details The relevant render functions are displayed based on the current
@@ -155,6 +161,7 @@ void Menu::render()
         renderPlayScreen();
     }
 }
+
 
 /**
  * @brief Displays an overlay on the Settings screen.
@@ -232,6 +239,7 @@ void Menu::renderSettingsScreen()
     }
 }
 
+
 /**
  * @brief Displays an overlay on the Play Game screen.
  * @details Displays the text of the level that is currently loaded into each
@@ -254,6 +262,7 @@ void Menu::renderPlayScreen()
     m_window->draw(m_saveSlot3Text);
 }
 
+
 /**
  * @brief Updates the settings.csv file to the current settings loaded in m_settings.
  * @details Opens a fstream file to update settings information. Data being written to the
@@ -275,6 +284,7 @@ void Menu::updateSettingsStruct()
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
 }
+
 
 /**
  * @brief Handles input related to the title screen, which is the first screen
@@ -337,6 +347,7 @@ void Menu::titleScreenInput()
         }
     }
 }
+
 
 /**
  * @brief Handles input related to the play screen.
@@ -434,6 +445,7 @@ void Menu::playScreenInput()
         }
     }
 }
+
 
 /**
  * @brief Handles input related to the settings screen.
@@ -584,6 +596,7 @@ void Menu::settingsScreenInput()
     }
 }
 
+
 /**
  * @brief Loads a .maze file to one of the three save slots.
  * @details Utilizes Python scripts for prompting the user with file explorer
@@ -628,3 +641,4 @@ void Menu::loadFileToSaveSlot(int saveSlot)
     }
     updateSettingsStruct();
 }
+

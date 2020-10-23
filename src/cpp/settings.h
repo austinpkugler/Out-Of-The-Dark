@@ -1,7 +1,9 @@
 #pragma once
 
+
 // Included C++11 Libraries
 #include <string>
+
 
 /**
  * Struct Name: Settings
@@ -20,3 +22,4 @@ struct Settings
     std::string saveSlot2;
     std::string saveSlot3;
 };
+
