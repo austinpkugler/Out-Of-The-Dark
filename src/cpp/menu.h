@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Included C++11 Libraries
 #include <vector>
 #include <string>
@@ -8,13 +9,16 @@
 #include <cstdio>
 #include <iostream>
 
+
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
 
+
 // Included Local Dependencies
 #include "settings.h"
 #include "section.h"
+
 
 /**
  * Class Name: Menu
@@ -60,3 +64,4 @@ private:
     sf::Text m_saveSlot2Text;
     sf::Text m_saveSlot3Text;
 };
+

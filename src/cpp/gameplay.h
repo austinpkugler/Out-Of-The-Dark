@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Included C++11 Libraries
 #include <vector>
 #include <string>
@@ -9,11 +10,14 @@
 #include <cstdlib>
 #include <cmath>
 
+
 // Included Graphics Library Dependencies
 #include <SFML/Graphics.hpp>
 
+
 // Included Local Dependencies
 #include "section.h"
+
 
 /**
  * Struct Name: Player
@@ -38,6 +42,7 @@ struct Player
 
 };
 
+
 /**
  * Struct Name: GameObject
  * Brief: Stores all data for a single tile.
@@ -53,6 +58,7 @@ struct GameObject
     bool walkable = false;
     sf::Sprite sprite;
 };
+
 
 /**
  * Class Name: Gameplay
@@ -80,6 +86,7 @@ public:
     virtual void update();          // Updates all gameplay variables based on events that occur.
     virtual void handleInput();     // Manages Gameplay input during game playthrough.
     virtual void render();          // Displays all Gameplay assets to the screen.
+
 
 private:
     // Private Member Functions for General Gameplay Processes
@@ -128,3 +135,4 @@ private:
     unsigned int GRID_SIZE;
     Player player;
 };
+

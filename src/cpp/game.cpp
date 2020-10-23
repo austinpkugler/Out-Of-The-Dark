@@ -1,5 +1,6 @@
 #include "game.h"
 
+
 /**
  * @brief Game class constructor
  * @details Initializes the variables required for running the game.
@@ -21,6 +22,7 @@ m_sectionName(SectionName::Menu)
     m_window->setFramerateLimit(m_settings->frameRate);
 }
 
+
 /**
  * @brief Destructor for the Game class.
  * @details Deletes the allocated memory for the m_settings and m_section
@@ -30,6 +32,8 @@ m_sectionName(SectionName::Menu)
 Game::~Game()
 {
 }
+
+
 /**
  * @brief Manages the loading of all Game assets.
  * @details Loads global assets and then calls specific load functions
@@ -62,6 +66,7 @@ void Game::load()
         m_music->play();
     }
 }
+
 
 /**
  * @brief Updates the game based on the current state.
@@ -106,6 +111,7 @@ void Game::update()
     m_clock.restart();
 }
 
+
 /**
  * @brief Manages all Game input.
  * @details When an input event occurs handleInput() calls the input handler
@@ -119,6 +125,7 @@ void Game::handleInput()
 {
     m_section->handleInput();
 }
+
 
 /**
  * @brief Displays all Game assets to the screen.
@@ -157,6 +164,7 @@ void Game::render()
     m_frameCount++;
 }
 
+
 /**
  * @brief Clears the game screen of all assets.
  * @details Calls the SFML clear function to replace the screen with solid
@@ -182,6 +190,7 @@ bool Game::isDone() const
 {
     return !(m_window->isOpen());
 }
+
 
 /**
  * @brief Loads the settings from a .ini file.
@@ -212,3 +221,4 @@ void Game::loadSettingsStruct()
     file.get(space);
     getline(file, m_settings->saveSlot3);
 }
+

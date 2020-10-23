@@ -1,21 +1,26 @@
 #pragma once
 
+
 // Included C++ Libraries
 #include <string>
 #include <memory>
 #include <iostream>
 
+
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
 
+
 // Included Local Dependencies
 #include "settings.h"
+
 
 enum class SectionName
 {
     Menu, MazeBuilder, SaveSlot1, SaveSlot2, SaveSlot3
 };
+
 
 /**
  * Class Name: Section
@@ -58,6 +63,7 @@ protected:
         }
         m_sound.setBuffer(*m_soundBuffer);
     }
+
 
     void playClicked()
     {

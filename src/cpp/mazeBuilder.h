@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Included C++11 Libraries
 #include <vector>
 #include <iostream>
@@ -8,13 +9,16 @@
 #include <stdlib.h>
 #include <algorithm>
 
+
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
 
+
 // Included Local Dependencies
 #include "section.h"
 #include "settings.h"
+
 
 /**
  * Struct Name: gridStruct
@@ -30,6 +34,7 @@ struct gridStruct
     unsigned int texture;
     sf::Sprite sprite;
 };
+
 
 /**
  * Class Name: MazeBuilder
@@ -55,6 +60,7 @@ public:
     virtual void update();          // Updates the MazeBuilder between input handling and rendering.
     virtual void handleInput();     // Polls input and updates screen based off of it.
     virtual void render();          // Renders the MazeBuilder screen.
+
 
 private:
     // Private Member Functions for General MazeBuilder Processes
@@ -92,3 +98,4 @@ private:
     int m_selectedTextureIndex;
     float m_textureSize;
 };
+

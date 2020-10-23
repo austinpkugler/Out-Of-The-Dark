@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Included C++ Libraries
 #include <vector>
 #include <string>
@@ -9,9 +10,11 @@
 #include <iostream>
 #include <memory>
 
+
 // Included Graphics Library Dependencies
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+
 
 // Included Local Dependencies
 #include "settings.h"
@@ -19,6 +22,7 @@
 #include "menu.h"
 #include "mazeBuilder.h"
 #include "gameplay.h"
+
 
 /**
  * Class Name: Game
@@ -51,6 +55,7 @@ public:
     bool isDone() const;            // Getter for the current status of the game.
     void loadSettingsStruct();      // Loads the settings from a .csv file.
 
+
 private:
     // Private SFML Member Variables
     std::shared_ptr<sf::RenderWindow> m_window;     // SFML base frame for all graphics.
@@ -68,3 +73,4 @@ private:
     float m_width;                  // The width of the SFML window.
     float m_height;                 // The height of the SFML window.
 };
+
