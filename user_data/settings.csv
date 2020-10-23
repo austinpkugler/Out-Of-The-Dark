@@ -1,8 +1,8 @@
 PLAY_MUSIC, 1
 PLAY_AUDIO, 1
-DIFFICULTY, 0
+DIFFICULTY, 1
 FRAME_RATE, 120
 SHOW_FPS, 1
-SAVESLOT_1, levels/level_1.maze
-SAVESLOT_2, levels/level_2.maze
-SAVESLOT_3, levels/level_3.maze
+SAVESLOT_1, 
+SAVESLOT_2, 
+SAVESLOT_3, 

@@ -10,18 +10,21 @@
  * @param float width - width of starting window (used for scaling)
  * @param float height - height of starting window (used for scaling)
  */
-MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float width, float height)
+MazeBuilder::MazeBuilder(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings, float width, float height) :
+m_TEXTURE_COUNT(8),
+m_textures(8)
 {
     m_window = window;
     m_width = width;
     m_height = height;
     m_screenName = "main_screen";
-    m_sectionName = "maze_builder";
-    m_backgroundTexture = new sf::Texture();
+    m_sectionName = SectionName::MazeBuilder;
+    m_backgroundTexture = std::make_unique<sf::Texture>();
     m_settings = settings;
 
     load();
 
+    
     // member variables for grid
     m_MAX_GRID_SIZE = 512;
     m_upperLeftSquare.x = m_MAX_GRID_SIZE/2;
@@ -50,7 +53,7 @@ MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float wid
     // rectangle to highlight current texture
     m_textureHighlightRect = sf::RectangleShape(sf::Vector2f(0.16 * m_width, 0.08 * m_height));
     m_textureHighlightRect.setFillColor(sf::Color(230, 230, 220, 150));
-
+    m_textureHighlightRect.setPosition(0.033*m_width, 0.11*m_height);
 }
 
 
@@ -62,14 +65,6 @@ MazeBuilder::MazeBuilder(sf::RenderWindow* window, Settings* settings, float wid
  */
 MazeBuilder::~MazeBuilder()
 {
-    delete m_backgroundTexture;
-    m_backgroundTexture = nullptr;
-
-    for (int i=0; i < m_textures.size(); ++i)
-    {
-        delete m_textures[i];
-        m_textures[i] = nullptr;
-    }
 }
 
 /**
@@ -81,13 +76,14 @@ MazeBuilder::~MazeBuilder()
  */
 void MazeBuilder::load()
 {
-    if (!m_backgroundTexture->loadFromFile("assets/maze_builder_background.png"))
+
+    if (!m_backgroundTexture->loadFromFile("../assets/maze_builder_background.png"))
     {
         std::exit(1);   
     }
     m_backgroundSprite.setTexture(*m_backgroundTexture);
 
-    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    if (!m_font.loadFromFile("../assets/rm_typerighter.ttf"))
     {
         std::exit(1);
     }
@@ -97,44 +93,49 @@ void MazeBuilder::load()
     m_gridLocation.setFillColor(sf::Color::White);
     m_gridLocation.setPosition(0.82*m_width, 0.95*m_height);
 
-    // populates texture vector for grid 
-    for (int i = 0; i < 8; i++)
+
+    for (unsigned int i=0; i < m_TEXTURE_COUNT; ++i)
     {
-        m_textures.push_back(new sf::Texture());
+        m_textures[i] = std::make_unique<sf::Texture>();
+    }
+        std::cout << m_textures.size();
+
+    if (!m_textures[0]->loadFromFile("../assets/blue_floor_texture.png"))
+    {
+        std::exit(1);
     }
 
-    if (!m_textures[0]->loadFromFile("assets/blue_floor_texture.png"))
+
+    if (!m_textures[1]->loadFromFile("../assets/blue_floor_trapped_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[1]->loadFromFile("assets/blue_floor_trapped_texture.png"))
+    if (!m_textures[2]->loadFromFile("../assets/blue_floor_fire_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[2]->loadFromFile("assets/blue_floor_fire_texture.png"))
+    if (!m_textures[3]->loadFromFile("../assets/death_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[3]->loadFromFile("assets/death_texture.png"))
+    if (!m_textures[4]->loadFromFile("../assets/wall_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[4]->loadFromFile("assets/wall_texture.png"))
+    if (!m_textures[5]->loadFromFile("../assets/alien_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[5]->loadFromFile("assets/alien_texture.png"))
+    if (!m_textures[6]->loadFromFile("../assets/start_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[6]->loadFromFile("assets/start_texture.png"))
+    if (!m_textures[7]->loadFromFile("../assets/end_texture.png"))
     {
         std::exit(1);
     }
-    if (!m_textures[7]->loadFromFile("assets/end_texture.png"))
-    {
-        std::exit(1);
-    }
+
+    loadSound(); // function to load sound (inherited from Section)
 }
 
 /**
@@ -148,39 +149,6 @@ void MazeBuilder::load()
  */
 void MazeBuilder::update()
 {
-
-    if (m_selectedTextureIndex == 0)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.11*m_height);
-    }
-    else if (m_selectedTextureIndex == 1)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.21*m_height);
-    }
-    else if (m_selectedTextureIndex == 2)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.31*m_height);
-    }
-    else if (m_selectedTextureIndex == 3)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.41*m_height);
-    }
-    else if (m_selectedTextureIndex == 4)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.51*m_height);
-    }
-    else if (m_selectedTextureIndex == 5)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.61*m_height);
-    }
-    else if (m_selectedTextureIndex == 6)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.71*m_height);
-    }
-    else if (m_selectedTextureIndex == 7)
-    {
-        m_textureHighlightRect.setPosition(0.033*m_width, 0.81*m_height);
-    }
 
     m_gridLocation.setString("Current position: (" + std::to_string(m_highlightedGridIndex.x)
                              + ", " + std::to_string(m_highlightedGridIndex.y) + ")");
@@ -225,42 +193,57 @@ void MazeBuilder::handleInput()
                     {
                         // std::cout << "texture 1 pressed\n";
                         m_selectedTextureIndex = 0;
-                        
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.11*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.21 * height && event.mouseButton.y <= 0.29 * height)
                     {
                         // std::cout << "texture 2 pressed\n";
                         m_selectedTextureIndex = 1;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.21*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.31 * height && event.mouseButton.y <= 0.39 * height)
                     {
                         // std::cout << "texture 3 pressed\n";
                         m_selectedTextureIndex = 2;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.31*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.41 * height && event.mouseButton.y <= 0.49 * height)
                     {
                         // std::cout << "texture 4 pressed\n";
                         m_selectedTextureIndex = 3;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.41*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.51 * height && event.mouseButton.y <= 0.59 * height)
                     {
                         // std::cout << "texture 5 pressed\n";
                         m_selectedTextureIndex = 4;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.51*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.61 * height && event.mouseButton.y <= 0.69 * height)
                     {
                         // std::cout << "texture 6 pressed\n";
                         m_selectedTextureIndex = 5;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.61*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.71 * height && event.mouseButton.y <= 0.79 * height)
                     {
                         // std::cout << "texture 7 pressed\n";
                         m_selectedTextureIndex = 6;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.71*m_height);
+                        playClicked();
                     }
                     else if (event.mouseButton.y >= 0.81 * height && event.mouseButton.y <= 0.89 * height)
                     {
                         // std::cout << "texture 8 pressed\n";
                         m_selectedTextureIndex = 7;
+                        m_textureHighlightRect.setPosition(0.033*m_width, 0.81*m_height);
+                        playClicked();
                     }
                 }
 
@@ -268,118 +251,41 @@ void MazeBuilder::handleInput()
                 {
                     if (event.mouseButton.x >= 0.22 * width && event.mouseButton.x <= 0.28 * width)
                     {
+                        playClicked();
                         loadFromFile();
+
                     }
 
                     if (event.mouseButton.x >= 0.32 * width && event.mouseButton.x <= 0.38 * width)
                     {
+                        playClicked();
                         generateFile();
                     }
                     if (event.mouseButton.x >= 0.4 * width && event.mouseButton.x <= 0.49 * width)
                     {
                         if (m_screenName == "main_screen")
                         {
+                            playClicked();
                             toPreview();
                         }
                         else if (m_screenName == "preview_screen")
                         {
+                            playClicked();
                             toMain();
                         }
                     }
 
                     if (event.mouseButton.x >= 0.91 * width && event.mouseButton.x <= 0.98 * width)
                     {
-                        m_sectionName = "menu"; // back button pressed
+                        m_sectionName = SectionName::Menu; // back button pressed
+                        playClicked();
                     }
                 }
             }
         }
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) // if mouse left is down (not an event)
-        {
-            for (int arr_x = m_upperLeftSquare.x; arr_x < (m_upperLeftSquare.x + m_squaresToDisplay); ++arr_x)
-            {
-                for (int arr_y = m_upperLeftSquare.y; arr_y < (m_upperLeftSquare.y + m_squaresToDisplay); ++arr_y)
-                {
-                    if (isMouseOnBlock(m_grid[arr_x][arr_y]))
-                    {
-                        m_grid[arr_x][arr_y].texture = m_selectedTextureIndex;
-                        m_grid[arr_x][arr_y].sprite.setScale(m_squareSize/m_textureSize,
-                                                             m_squareSize/m_textureSize);
-                    }
-                }
-            }
-        }
-
-        else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) // if mouse right is down (not an event)
-        {
-            for (int arr_x = m_upperLeftSquare.x; arr_x < (m_upperLeftSquare.x + m_squaresToDisplay); ++arr_x)
-            {
-                for (int arr_y = m_upperLeftSquare.y; arr_y < (m_upperLeftSquare.y + m_squaresToDisplay); ++arr_y)
-                {
-                    if (isMouseOnBlock(m_grid[arr_x][arr_y]))
-                    {
-                        m_grid[arr_x][arr_y].texture = 4;
-                        m_grid[arr_x][arr_y].sprite.setScale(m_squareSize/m_textureSize,
-                                                             m_squareSize/m_textureSize);
-                    }
-                }
-            }
-        }
-
-        if (event.type == sf::Event::MouseMoved)
-        {
-            m_highlightedGridIndex.x = m_highlightedGridIndex.y = -1; // make no highlighted square
-            for (int x = 0; x < m_squaresToDisplay; ++x)
-                {
-                    for (int y = 0; y < m_squaresToDisplay; ++y)
-                    {
-                        int xIndex = x + m_upperLeftSquare.x;
-                        int yIndex = y + m_upperLeftSquare.y;
-                        if (isMouseOnBlock(m_grid[xIndex][yIndex]) == true)
-                        {
-                            m_highlightedGridIndex.x = xIndex;
-                            m_highlightedGridIndex.y = yIndex;
-                            return;
-                        }
-                    }
-                }
-            
-
-            // loop through displayable blocks and see if mouse is on them if so, set m_highlighted to that
-        }
-
-        if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
-            {
-                if (m_upperLeftSquare.y - 1 >= 0) // move up if possible
-                {
-                    m_upperLeftSquare.y--;
-                }
-            }
-            if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
-            {
-                if (m_upperLeftSquare.x - 1 >= 0) // move up if possible
-                {
-                    m_upperLeftSquare.x--;
-                }
-            }
-            if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-            {
-                if (m_upperLeftSquare.y + m_squaresToDisplay < m_MAX_GRID_SIZE) // move up if possible
-                {
-                    m_upperLeftSquare.y++;
-                }
-            }
-            if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
-            {
-                if (m_upperLeftSquare.x + m_squaresToDisplay < m_MAX_GRID_SIZE) // move up if possible
-                {
-                    m_upperLeftSquare.x++;
-                }
-            }
-        }
+        handleMouse(event);
+        handleKeyboard(event);
     }
 }
 
@@ -405,6 +311,118 @@ void MazeBuilder::render()
     m_window->draw(m_gridLocation);
 }
 
+
+std::optional<sf::Vector2i> MazeBuilder::blockMouseIsOn() const
+{
+    // scales the position of the mouse to m_width & m_height, since everything else is in terms of m_width and m_height
+    float mouseX = sf::Mouse::getPosition(*m_window).x;
+    float mouseY = sf::Mouse::getPosition(*m_window).y;
+    mouseX /= m_window->getSize().x;
+    mouseY /= m_window->getSize().y;
+    mouseX *= m_width;
+    mouseY *= m_height;
+
+
+    int x = ((mouseX - m_mazeOrigin.x)/ m_squareSize) + m_upperLeftSquare.x;
+    int y = ((mouseY - m_mazeOrigin.y) / m_squareSize) + m_upperLeftSquare.y;
+    if (x >= m_upperLeftSquare.x + m_squaresToDisplay || x < m_upperLeftSquare.x || 
+        y >= m_upperLeftSquare.y + m_squaresToDisplay || y < m_upperLeftSquare.y)
+    {
+        return std::nullopt;
+    }
+    return sf::Vector2i(x, y);
+}
+
+
+/**
+ * @brief Handels input specific to mouse, excluding virtual button presses.
+ * @details Input related to mouse movement and button clicks that do not relate
+ * to meny buttons are handled here.
+ * @throw None
+ * @param event - the event variable that is created upon input.
+ * @return None
+ */
+void MazeBuilder::handleMouse(sf::Event& event)
+{
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) // if mouse left is down (not an event)
+    {
+        std::optional<sf::Vector2i> blockMouseOn = blockMouseIsOn();
+        if (blockMouseOn)
+        {
+            m_grid[blockMouseOn->x][blockMouseOn->y].texture = m_selectedTextureIndex;
+            m_grid[blockMouseOn->x][blockMouseOn->y].sprite.setScale(m_squareSize/m_textureSize,
+                                                         m_squareSize/m_textureSize);
+        }
+
+    }
+
+    else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) // if mouse right is down (not an event)
+    {
+        std::optional<sf::Vector2i> blockMouseOn = blockMouseIsOn();
+        if (blockMouseOn)
+        {
+            m_grid[blockMouseOn->x][blockMouseOn->y].texture = 4;
+            m_grid[blockMouseOn->x][blockMouseOn->y].sprite.setScale(m_squareSize/m_textureSize,
+                                                         m_squareSize/m_textureSize);
+        }
+    }
+
+    if (event.type == sf::Event::MouseMoved)
+    {
+        m_highlightedGridIndex.x = m_highlightedGridIndex.y = -1; // make no highlighted square
+
+        std::optional<sf::Vector2i> blockMouseOn = blockMouseIsOn();
+        if (blockMouseOn)
+        {
+            m_highlightedGridIndex.x = blockMouseOn->x;
+            m_highlightedGridIndex.y = blockMouseOn->y;
+        }
+    }
+}
+
+/**
+ * @brief Handles input specific to the keyboard.
+ * @details All keypress based input that occurs in the Maze Builder is handled 
+ * here.
+ * @throw None
+ * @param event - the event variable that is created upon input.
+ * @return None
+ */
+void MazeBuilder::handleKeyboard(sf::Event& event)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+        {
+            if (m_upperLeftSquare.y - 1 >= 0) // move up if possible
+            {
+                m_upperLeftSquare.y--;
+            }
+        }
+        if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
+        {
+            if (m_upperLeftSquare.x - 1 >= 0) // move up if possible
+            {
+                m_upperLeftSquare.x--;
+            }
+        }
+        if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+        {
+            if (m_upperLeftSquare.y + m_squaresToDisplay < m_MAX_GRID_SIZE) // move up if possible
+            {
+                m_upperLeftSquare.y++;
+            }
+        }
+        if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
+        {
+            if (m_upperLeftSquare.x + m_squaresToDisplay < m_MAX_GRID_SIZE) // move up if possible
+            {
+                m_upperLeftSquare.x++;
+            }
+        }
+    }
+}
+
 /**
  * @brief Saves current maze data to a file.
  * @details Invokes a python script to open file explorer for user to save file. If a filename exists, it 
@@ -417,14 +435,14 @@ void MazeBuilder::generateFile()
 {
     if (m_mazeFileName == "") // if there isnt a fileName, dont have recommended name
     {
-        m_mazeFileName = "python getMazeName/saveAs.py";
+        m_mazeFileName = "python ../python/saveAs.pyw";
     }
     else // otherwise do have recommended name
     {
-        m_mazeFileName = "python getMazeName/saveAs.py \"" + m_mazeFileName + "\"";
+        m_mazeFileName = "python ../python/saveAs.pyw \"" + m_mazeFileName + "\"";
     }
     system(m_mazeFileName.c_str()); // get filename to save as
-    std::fstream file("getMazeName/filename.txt");
+    std::fstream file("../python/filename.txt");
     std::getline(file, m_mazeFileName);
     file.close();
 
@@ -437,8 +455,6 @@ void MazeBuilder::generateFile()
             file << m_grid[x][y].texture << '\n';
         }
     }
-
-    file.close();
 }
 
 /**
@@ -452,9 +468,9 @@ void MazeBuilder::generateFile()
 void MazeBuilder::loadFromFile()
 {
     // opens file using python tkinter
-    system("python getMazeName/openFile.py");
+    system("python ../python/openFile.pyw");
 
-    std::fstream file("getMazeName/filename.txt", std::ios::in);
+    std::fstream file("../python/filename.txt", std::ios::in);
     getline(file, m_mazeFileName);
     file.close();
 
@@ -467,8 +483,6 @@ void MazeBuilder::loadFromFile()
             file >> m_grid[x][y].texture;
         }
     }
-
-    file.close();
 }
 
 /**
@@ -615,8 +629,23 @@ void MazeBuilder::toPreview()
     {
         return;
     }
-    m_squaresToDisplay = std::max(right-left, bottom-top)+2;
-    m_squareSize = static_cast<float>(std::max(m_width - m_mazeOrigin.x, m_height - m_mazeOrigin.y)) / m_squaresToDisplay;
+
+    float delta_x = right-left;
+    float delta_y = bottom-top;
+    float gridWidth = m_width - m_mazeOrigin.x;
+    float gridHeight = m_height - m_mazeOrigin.y;
+
+    if (delta_x/gridWidth > delta_y/gridHeight) // if size of maze (in x) is greater than size of maze (in y) after both are scaled by width and height
+    {
+        m_squaresToDisplay = delta_x + 2; // min amount of squares needed to display
+    }
+    else
+    {
+        m_squaresToDisplay = delta_y*(gridWidth/gridHeight);
+
+    }
+    
+    m_squareSize = static_cast<float>(std::max(gridWidth, gridHeight)) / m_squaresToDisplay;
     m_upperLeftSquare.x = left;
     m_upperLeftSquare.y = top;
     for (int i=0; i < m_MAX_GRID_SIZE; ++i)

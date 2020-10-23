@@ -7,7 +7,6 @@
 #include <fstream>
 #include <cstdio>
 #include <iostream>
-#include <windows.h>
 
 // Included Graphics Library Dependencies
 #include "SFML/Graphics.hpp"
@@ -28,17 +27,22 @@ class Menu: public Section
 {
 public:
     // Constructor and Destructor
-    Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height);
+    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings,
+         std::shared_ptr<sf::Music> music, float width, float height);
     ~Menu();
+    Menu(const Menu&) = delete;            // copy constructor
+    Menu(Menu&&) = delete;                 // move constructor
+    Menu& operator=(const Menu&) = delete; // copy assignment
+    Menu& operator=(Menu&&) = delete;      // move assignment
 
-    // Public Member Functions for General Gameplay Processes
+    // Public Member Functions for General Menu Processes
     virtual void load();            // Manages the loading of all Menu assets.
     virtual void update();          // Dummy function for updating the Menu.
     virtual void handleInput();     // Manages Menu input and calls the relevant input handler.
     virtual void render();          // Displays all Menu assets to the screen.
 
 private:
-    // Private Member Functions for General Gameplay Processes
+    // Private Member Functions for General Menu Processes
     void renderSettingsScreen();            // Displays an overlay on the Settings screen.
     void renderPlayScreen();                // Displays an overlay on the Play Game screen.
     void updateSettingsStruct();            // Updates the settings.csv file to the current settings loaded in m_settings.
@@ -49,8 +53,8 @@ private:
 
     // Private SFML Member Variables
     sf::Sprite m_backgroundSprite;
-    sf::Texture* m_backgroundTexture;
-    sf::Music* m_music;
+    std::unique_ptr<sf::Texture> m_backgroundTexture;
+    std::shared_ptr<sf::Music> m_music;
     sf::Font m_font;
     sf::Text m_saveSlot1Text;
     sf::Text m_saveSlot2Text;

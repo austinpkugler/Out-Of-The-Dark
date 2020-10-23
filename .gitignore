@@ -1,3 +1,8 @@
 *.exe
-c_cpp_properties.json
-*.dll
+*.o
+build/
+Makefile
+OutOfTheDark
+.vscode/
+settings.csv
+vscode/

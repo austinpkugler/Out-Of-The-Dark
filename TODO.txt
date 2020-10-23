@@ -1,9 +1,22 @@
-add some animations
-add some sound on button clicks
-add an installer on github using Advanced installer
-create more blocks
-add randomly generated maze in maze builder
-make preview maze show whole maze
-make youtube video
-make spaces in maze file names legal
-if the window is not focused, stop everything
+----------------
+Small Additions:
+----------------
+1.  enum classes to screen_name
+2.  create a struct of WindowAndAssets (or similar) to get rid of params in Gameplay
+3.  dont use random numbers, use constants with variable names throughout code
+4.  get rid of new/delete and make smart pointers throughout code
+5.  follow the rule of 5/0 design for constructor destructor copy constructor move ....
+6.  "You have personal information in filename.txt, if you have secrets like 
+    passwords or personal information, they should be in uncommitted settings files
+    that the user is instructed to create, or in environment variables the user is
+    asked to set up."
+
+----------------
+Large Additions:
+----------------
+1.  consider using a c++ gui
+2.  create some code that can be used to create your own library
+3.  create an installer for the project
+4.  readme to include build/compile isntructions
+5.  take out .vscode and windows-binary folders. use github releases instead
+

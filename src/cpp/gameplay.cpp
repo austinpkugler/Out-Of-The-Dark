@@ -19,7 +19,8 @@
  * @param saveSlot - an integer that contains the current save slot being
  * played between 1-3.
  */
-Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height, std::string fileName, int saveSlot)
+Gameplay::Gameplay(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings, 
+                   std::shared_ptr<sf::Music> music, float width, float height, std::string fileName, int saveSlot) : vectorOfTextures(8)
 {
     m_window = window;
     m_settings = settings;
@@ -34,23 +35,25 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     player.velocity.y = 0;
     m_screenName = "game_screen";
 
-    deathScreenTexture = new sf::Texture();
-    hardModeTexture = new sf::Texture();
-    pausedScreenTexture = new sf::Texture();
-    settingsScreenTexture = new sf::Texture();
-    winScreenTexture = new sf::Texture();
+
+
+    deathScreenTexture = std::make_unique<sf::Texture>();
+    hardModeTexture = std::make_unique<sf::Texture>();
+    pausedScreenTexture = std::make_unique<sf::Texture>();
+    settingsScreenTexture = std::make_unique<sf::Texture>();;
+    winScreenTexture = std::make_unique<sf::Texture>();
 
     if (saveSlot == 1)
     {
-        m_sectionName = "save_slot_1";
+        m_sectionName = SectionName::SaveSlot1;
     }
     else if (saveSlot == 2)
     {
-        m_sectionName = "save_slot_2";
+        m_sectionName = SectionName::SaveSlot2;
     }
     else if (saveSlot == 3)
     {
-        m_sectionName = "save_slot_3";
+        m_sectionName = SectionName::SaveSlot3;
     }
 
 
@@ -64,6 +67,7 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
     healthBar.setSize(sf::Vector2f(0.15 * m_width, 0.01 * height));
     healthBar.setFillColor(sf::Color(0, 128, 0));
     healthBar.setPosition(squareSize, 0.93 * m_height);
+
 
     load();
 
@@ -89,17 +93,6 @@ Gameplay::Gameplay(sf::RenderWindow* window, Settings* settings, sf::Music* musi
  */
 Gameplay::~Gameplay()
 {
-    delete deathScreenTexture;
-    delete hardModeTexture;
-    delete pausedScreenTexture;
-    delete settingsScreenTexture;
-    delete player.texturePtr;
-    delete winScreenTexture;
-    delete player.texturePtr;
-    for (int i = 0; i < 8; i++)
-    {
-        delete vectorOfTextures[i];
-    }
 }
 
 /**
@@ -115,81 +108,83 @@ Gameplay::~Gameplay()
  */
 void Gameplay::load()
 {
-    for (int i = 0; i < 8; i++)
+
+    for (unsigned int i=0; i < vectorOfTextures.size(); ++i)
     {
-        vectorOfTextures.push_back(new sf::Texture());
+        vectorOfTextures[i] = std::make_unique<sf::Texture>();
     }
 
-    if (!vectorOfTextures[0]->loadFromFile("assets/blue_floor_texture.png"))
+    if (!vectorOfTextures[0]->loadFromFile("../assets/blue_floor_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[1]->loadFromFile("assets/blue_floor_trapped_texture.png"))
+    if (!vectorOfTextures[1]->loadFromFile("../assets/blue_floor_trapped_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_trapped_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[2]->loadFromFile("assets/blue_floor_fire_texture.png"))
+    if (!vectorOfTextures[2]->loadFromFile("../assets/blue_floor_fire_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'blue_floor_fire_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[3]->loadFromFile("assets/death_texture.png"))
+    if (!vectorOfTextures[3]->loadFromFile("../assets/death_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'death_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[4]->loadFromFile("assets/wall_texture.png"))
+    if (!vectorOfTextures[4]->loadFromFile("../assets/wall_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'wall_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[5]->loadFromFile("assets/alien_texture.png"))
+    if (!vectorOfTextures[5]->loadFromFile("../assets/alien_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'alien_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[6]->loadFromFile("assets/start_texture.png"))
+    if (!vectorOfTextures[6]->loadFromFile("../assets/start_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'start_texture.png'\n";
         std::exit(1);
     }
-    if (!vectorOfTextures[7]->loadFromFile("assets/end_texture.png"))
+    if (!vectorOfTextures[7]->loadFromFile("../assets/end_texture.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'end_texture.png'\n";
         std::exit(1);
     }
-    if (!player.texturePtr->loadFromFile("assets/player.png"))
+    if (!player.texturePtr->loadFromFile("../assets/player.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'player.png'\n";
         std::exit(1);
     }
-    if (!deathScreenTexture->loadFromFile("assets/death_background.png"))
+    if (!deathScreenTexture->loadFromFile("../assets/death_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'death_background.png'\n";
         std::exit(1);
     }
-    if (!hardModeTexture->loadFromFile("assets/hard_mode_background.png"))
+    if (!hardModeTexture->loadFromFile("../assets/hard_mode_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'hard_mode_background.png'\n";
         std::exit(1);
     }
-    if (!pausedScreenTexture->loadFromFile("assets/paused_screen_background.png"))
+    if (!pausedScreenTexture->loadFromFile("../assets/paused_screen_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'paused_screen_background.png'\n";
         std::exit(1);
     }
-    if (!settingsScreenTexture->loadFromFile("assets/settings_screen_background.png"))
+    if (!settingsScreenTexture->loadFromFile("../assets/settings_screen_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'settings_screen_background.png'\n";
         std::exit(1);
     }
-    if (!winScreenTexture->loadFromFile("assets/win_background.png"))
+    if (!winScreenTexture->loadFromFile("../assets/win_background.png"))
     {
         std::cout << "Gameplay: Failed to load asset 'win_background.png'\n";
         std::exit(1);
     }
+    loadSound();
 
     player.sprite.setTexture(*player.texturePtr);
     player.sprite.setScale((squareSize / 240.0f) * 0.7, (squareSize / 240.0f) * 0.7);
@@ -214,6 +209,27 @@ void Gameplay::load()
 }
 
 /**
+ * @brief Rotates the player sprite to look towards where the mouse is
+ * @details changes the absolute rotation of the player sprite so it looks where
+ *          the mouse currently is. This is called every frame in Gamplay::update().
+ * 
+ * @throw SFML exceptions may be thrown during fatal errors.
+ * @param None
+ * @return None
+ */
+void Gameplay::rotatePlayerToMouse()
+{
+    const double pi = 3.14159265358979323846;
+    sf::Vector2i mouseCoordsInt = sf::Mouse::getPosition(*m_window);
+    sf::Vector2f mouseCoords(mouseCoordsInt.x, mouseCoordsInt.y);
+    mouseCoords.x /= m_window->getSize().x / m_width; 
+    mouseCoords.y /= m_window->getSize().y / m_height; 
+    float rotation = std::atan2(mouseCoords.x - player.x,
+                                mouseCoords.y - player.y);
+    player.sprite.setRotation(rotation*-180/pi);
+}
+
+/**
  * @brief Updates all gameplay variables based on events that occur.
  * @details Handles checking for death, applying of damage, calculating new
  * player posistions, and other graphical updates. This function is called from
@@ -227,22 +243,24 @@ void Gameplay::update()
 {
     if (m_screenName == "game_screen")
     {
+        rotatePlayerToMouse();
         calculatePlayerVelocity();
         calculateCollision();
 
         if (playerWon())
         {
-            player.status = "won";
+            player.status = Player::Won;
         }
 
 
         m_squareToMoveTo.move(player.velocity.x, player.velocity.y);
 
-        GameObject blockMouseOn = blockMouseIsOn();
-        if (blockMouseOn.arrIndexX != -1)
+        std::optional<GameObject> blockMouseOn = blockMouseIsOn();
+
+        if (blockMouseOn)
         {
-            m_highlightedGridRect.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
-                                            (blockMouseOn.arrIndexY - upperLeftSquare.y)*squareSize + gridOffset.y);
+            m_highlightedGridRect.setPosition((blockMouseOn->arrIndexX - upperLeftSquare.x)*squareSize + gridOffset.x,
+                                            (blockMouseOn->arrIndexY - upperLeftSquare.y)*squareSize + gridOffset.y);
                                             
         }
         if (gridOffset.x >= squareSize)
@@ -292,20 +310,24 @@ void Gameplay::handleInput()
             {
                 m_window->close();
             }
+            else if (event.type == sf::Event::LostFocus)
+            {
+                m_screenName = "paused_screen";
+            }
             else if (event.type == sf::Event::MouseButtonPressed)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    if (player.status == "alive")
+                    if (player.status == Player::Alive)
                     {
-                        GameObject blockMouseOn = blockMouseIsOn();
-                        if (blockMouseOn.arrIndexX != -1)
+                        std::optional<GameObject> blockMouseOn = blockMouseIsOn();
+                        if (blockMouseOn)
                         {
-                            m_squareToMoveTo.setPosition((blockMouseOn.arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x,
-                                                        (blockMouseOn.arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
+                            m_squareToMoveTo.setPosition((blockMouseOn->arrIndexX - upperLeftSquare.x) * squareSize + gridOffset.x,
+                                                        (blockMouseOn->arrIndexY - upperLeftSquare.y) * squareSize + gridOffset.y);
                         }
                     }
-                    else if (player.status == "dead" || player.status == "won")
+                    else if (player.status == Player::Dead || player.status == Player::Won)
                     {
                         resetLevel();
                     }
@@ -344,13 +366,13 @@ void Gameplay::render()
     if (m_screenName == "game_screen")
     {
         renderGrid();
-        if (player.status == "alive")
+        if (player.status == Player::Alive)
         {
             if (m_squareToMoveTo.getPosition().x != -1)
             {
                 m_window->draw(m_squareToMoveTo);
             }
-            if (blockMouseIsOn().arrIndexX != -1)
+            if (blockMouseIsOn())
             {
                 m_window->draw(m_highlightedGridRect);
             }
@@ -364,11 +386,11 @@ void Gameplay::render()
                 m_window->draw(hardModeSprite);
             }
         }
-        else if (player.status == "dead")
+        else if (player.status == Player::Dead)
         {
             m_window->draw(deathScreenSprite);
         }
-        else if (player.status == "won")
+        else if (player.status == Player::Won)
         {
             m_window->draw(winScreenSprite);
         }
@@ -496,7 +518,7 @@ void Gameplay::calculateCollision()
     if (player.healthPercent <= 0)
     {
         player.healthPercent = 0;
-        player.status = "dead";
+        player.status = Player::Dead;
     }
 }
 
@@ -557,7 +579,6 @@ void Gameplay::populateGrid()
             };
         }
     }
-    file.close();
 }
 
 /**
@@ -631,7 +652,7 @@ void Gameplay::resetLevel()
     m_squareToMoveTo.setPosition(-1, -1);
 
     player.healthPercent = 100;
-    player.status = "alive";
+    player.status = Player::Alive;
     populateGrid();
 }
 
@@ -644,7 +665,7 @@ void Gameplay::resetLevel()
  * @param None
  * @return m_maze[x][y] - an instance of the GameObject struct.
  */
-const GameObject Gameplay::blockMouseIsOn() const
+std::optional<GameObject> Gameplay::blockMouseIsOn() const
 {
     // scales the position of the mouse to m_width & m_height, since everything else is in terms of m_width and m_height
     float mouseX = sf::Mouse::getPosition(*m_window).x;
@@ -659,7 +680,7 @@ const GameObject Gameplay::blockMouseIsOn() const
     int y = ((mouseY - gridOffset.y) / squareSize) + upperLeftSquare.y;
     if (x >= GRID_SIZE || x < 0 || y >= GRID_SIZE || y < 0)
     {
-        return GameObject();
+        return std::nullopt;
     }
     return m_maze[x][y];
 }
@@ -764,18 +785,21 @@ void Gameplay::pausedScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         // std::cout << "Gameplay: 'Back To Game' button pressed\n";
+                        playClicked();
                         m_screenName = "game_screen";
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
                         // std::cout << "Gameplay: 'Main Menu' button pressed\n";
-                        m_sectionName = "menu";
+                        playClicked();
+                        m_sectionName = SectionName::Menu;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         // std::cout << "Gameplay: 'Settings' button pressed\n";
+                        playClicked();
                         m_screenName = "settings_screen";
                     }
                 }
@@ -819,6 +843,7 @@ void Gameplay::settingsScreenInput()
                 if (event.mouseButton.x >= width * 0.30 &&
                     event.mouseButton.x <= width * 0.37)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.25 &&
                         event.mouseButton.y <= height * 0.30)
                     {
@@ -858,6 +883,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.40 &&
                          event.mouseButton.x <= width * 0.48)
                 {
+                    playClicked();
                     if (event.mouseButton.y >=height * 0.25 &&
                         event.mouseButton.y <=height * 0.30)
                     {
@@ -897,6 +923,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.50 &&
                          event.mouseButton.x <= width * 0.56)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.55 &&
                         event.mouseButton.y <= height * 0.6)
                     {
@@ -908,6 +935,7 @@ void Gameplay::settingsScreenInput()
                 else if (event.mouseButton.x >= width * 0.10 &&
                          event.mouseButton.x <= width * 0.16)
                 {
+                    playClicked();
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
@@ -1044,8 +1072,7 @@ void Gameplay::calculatePlayerVelocity()
  */
 void Gameplay::updateSettingsStruct()
 {
-    std::fstream file("user_data/settings.csv", std::ios::out);
-    const char comma = ',';
+    std::fstream file("../user_data/settings.csv", std::ios::out);
     file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
     file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
     file << "DIFFICULTY, " << m_settings->difficulty << '\n';
@@ -1055,5 +1082,4 @@ void Gameplay::updateSettingsStruct()
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
     m_window->setFramerateLimit(m_settings->frameRate);
-    file.close();
 }

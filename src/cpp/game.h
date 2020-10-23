@@ -1,17 +1,17 @@
 #pragma once
 
-// Included C++11 Libraries
+// Included C++ Libraries
 #include <vector>
 #include <string>
 #include <stdlib.h>
 #include <fstream>
 #include <cstdio>
 #include <iostream>
-#include <windows.h>
+#include <memory>
 
 // Included Graphics Library Dependencies
-#include "SFML/Graphics.hpp"
-#include "SFML/Audio.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 // Included Local Dependencies
 #include "settings.h"
@@ -35,8 +35,12 @@ class Game
 {
 public:
     // Constructor and Destructor
-    Game(sf::RenderWindow* window);
+    Game(std::shared_ptr<sf::RenderWindow> window);
     ~Game();
+    Game(const Game&) = delete;            // copy constructor
+    Game(Game&&) = delete;                 // move constructor
+    Game& operator=(const Game&) = delete; // copy assignment
+    Game& operator=(Game&&) = delete;      // move assignment
 
     // Public Member Functions for General Game Processes
     void load();                    // Manages the loading of all game assets.
@@ -44,23 +48,20 @@ public:
     void handleInput();             // Manages all game input.
     void render();                  // Displays all game assets to the screen.
     void clearScreen();             // Clears the game screen of all assets.
-    int getFps() const;             // Getter function for the current FPS being displayed.
-    void setFps(unsigned int);      // Updates the current FPS with the newest value.
-    void playSoundBuffer();         // Plays the contents of the current sound buffer member variable.
     bool isDone() const;            // Getter for the current status of the game.
     void loadSettingsStruct();      // Loads the settings from a .csv file.
 
 private:
     // Private SFML Member Variables
-    sf::RenderWindow* m_window;     // SFML base frame for all graphics.
+    std::shared_ptr<sf::RenderWindow> m_window;     // SFML base frame for all graphics.
     sf::Font m_font;                // SFML instance of the game's generic font.
-    sf::Music* m_music;             // SFML instance of the current game music.
-    sf::SoundBuffer m_soundBuffer;  // SFML instance of the current sound effect.
+    std::shared_ptr<sf::Music> m_music;             // SFML instance of the current game music.
+    sf::Clock m_clock;
 
     // Private Game Member Variables
-    Settings* m_settings;           // Pointer to the current settings configuration.
-    Section* m_section;             // Pointer to the current section object.
-    std::string  m_sectionName;     // The name of the current section (ex: title_screen).
+    std::shared_ptr<Settings> m_settings;           // Pointer to the current settings configuration.
+    std::unique_ptr<Section> m_section;             // Pointer to the current section object.
+    SectionName  m_sectionName;     // The name of the current section (ex: title_screen).
     unsigned int m_fps = 0;         // The current FPS being experienced.
     unsigned int m_displayedFps = 0;// The current FPS being displayed.
     unsigned int m_frameCount = 0;  // The number of elapsed frames.

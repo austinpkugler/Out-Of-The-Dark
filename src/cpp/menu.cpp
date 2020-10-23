@@ -14,7 +14,8 @@
  * @param width - a float containing the starting width of the game window.
  * @param height - a float containing the starting height of the game window.
  */
-Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float width, float height)
+Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Settings> settings,
+           std::shared_ptr<sf::Music> music, float width, float height)
 {
     m_window = window;
     m_settings = settings;
@@ -22,9 +23,11 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
     m_width = width;
     m_height = height;
     m_screenName = "title_screen";
-    m_sectionName = "menu";
-    m_backgroundTexture = new sf::Texture();
+    m_sectionName = SectionName::Menu;
+    m_backgroundTexture = std::make_unique<sf::Texture>();
+    m_soundBuffer = std::make_unique<sf::SoundBuffer>();
     load();
+
 }
 
 /**
@@ -33,7 +36,6 @@ Menu::Menu(sf::RenderWindow* window, Settings* settings, sf::Music* music, float
  */
 Menu::~Menu()
 {
-    delete m_backgroundTexture;
 }
 
 /**
@@ -50,7 +52,7 @@ void Menu::load()
     if (m_screenName == "title_screen")
     {
 
-        if (!m_backgroundTexture->loadFromFile("assets/title_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/title_screen_background.png"))
         {
             std::exit(1);
         }
@@ -58,23 +60,25 @@ void Menu::load()
     }
     else if (m_screenName == "play_screen")
     {
-        if (!m_backgroundTexture->loadFromFile("assets/play_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/play_screen_background.png"))
         {
             std::exit(1);
         }
     }
     else if (m_screenName == "settings_screen")
     {
-        if (!m_backgroundTexture->loadFromFile("assets/settings_screen_background.png"))
+        if (!m_backgroundTexture->loadFromFile("../assets/settings_screen_background.png"))
         {
             std::exit(1);
         }
     }
 
-    if (!m_font.loadFromFile("assets/rm_typerighter.ttf"))
+    if (!m_font.loadFromFile("../assets/rm_typerighter.ttf"))
     {
         std::exit(1);
     }
+
+    loadSound();
 
     m_backgroundSprite.setTexture(*m_backgroundTexture);
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
@@ -261,8 +265,7 @@ void Menu::renderPlayScreen()
  */
 void Menu::updateSettingsStruct()
 {
-    std::fstream file("user_data/settings.csv", std::ios::out);
-    const char comma = ',';
+    std::fstream file("../user_data/settings.csv", std::ios::out);
     file << "PLAY_MUSIC, " << m_settings->playMusic << '\n';
     file << "PLAY_AUDIO, " << m_settings->playAudio << '\n';
     file << "DIFFICULTY, " << m_settings->difficulty << '\n';
@@ -271,7 +274,6 @@ void Menu::updateSettingsStruct()
     file << "SAVESLOT_1, " << m_settings->saveSlot1 << '\n';
     file << "SAVESLOT_2, " << m_settings->saveSlot2 << '\n';
     file << "SAVESLOT_3, " << m_settings->saveSlot3 << '\n';
-    file.close();
 }
 
 /**
@@ -306,6 +308,7 @@ void Menu::titleScreenInput()
                     {
                         // std::cout << "Menu: 'Play Game' button pressed\n";
                         m_screenName = "play_screen";
+                        playClicked();
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.35 &&
@@ -313,13 +316,15 @@ void Menu::titleScreenInput()
                     {
                         // std::cout << "Menu: 'Settings' button pressed\n";
                         m_screenName = "settings_screen";
+                        playClicked();
                         load();
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.5)
                     {
                         // std::cout << "Menu: 'Maze builder' button pressed\n";
-                        m_sectionName = "maze_builder";
+                        playClicked();
+                        m_sectionName = SectionName::MazeBuilder;
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.6)
@@ -359,28 +364,30 @@ void Menu::playScreenInput()
                 if (event.mouseButton.y >= height * 0.23 &&
                     event.mouseButton.y <= height * 0.69)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
                         // std::cout << "Menu: 'Save Slot 1' button pressed\n";
-                        m_sectionName = "save_slot_1";
+                        m_sectionName = SectionName::SaveSlot1;
                     }
                     else if (event.mouseButton.x >= width * 0.39 &&
                              event.mouseButton.x <= width * 0.61)
                     {
                         // std::cout << "Menu: 'Save Slot 2' button pressed\n";
-                        m_sectionName = "save_slot_2";
+                        m_sectionName = SectionName::SaveSlot2;
                     }
                     else if (event.mouseButton.x >= width * 0.69 &&
                              event.mouseButton.x <= width * 0.91)
                     {
                         // std::cout << "Menu: 'Save Slot 3' button pressed\n";
-                        m_sectionName = "save_slot_3";
+                        m_sectionName = SectionName::SaveSlot3;
                     }
                 }
                 if (event.mouseButton.y >= height * 0.75 &&
                     event.mouseButton.y <= height * 0.8)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.1 &&
                     event.mouseButton.x <= width * 0.165)
                     {
@@ -394,6 +401,7 @@ void Menu::playScreenInput()
                 if (event.mouseButton.y >= height * 0.23 &&
                     event.mouseButton.y <= height * 0.69)
                 {
+                    playClicked();
                     if (event.mouseButton.x >= width * 0.09 &&
                         event.mouseButton.x <= width * 0.31)
                     {
@@ -457,6 +465,8 @@ void Menu::settingsScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = true;
+                        playClicked();
+
                         if (m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Stopped)
                         {
                             m_music->play();
@@ -466,22 +476,30 @@ void Menu::settingsScreenInput()
                              event.mouseButton.y <= height * 0.40)
                     {
                         m_settings->playAudio = true;
+                        playClicked();
+
+
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         m_settings->difficulty = 0;
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 30;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
                         m_settings->showFps = true;
+                        playClicked();
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.40 &&
@@ -491,6 +509,8 @@ void Menu::settingsScreenInput()
                         event.mouseButton.y <= height * 0.30)
                     {
                         m_settings->playMusic = false;
+                        playClicked();
+
                         if (!m_settings->playMusic && m_music->getStatus() == sf::Music::Status::Playing)
                         {
                             m_music->stop();
@@ -499,23 +519,30 @@ void Menu::settingsScreenInput()
                     else if (event.mouseButton.y >= height * 0.35 &&
                              event.mouseButton.y <= height * 0.40)
                     {
+                        playClicked();
                         m_settings->playAudio = false;
                     }
                     else if (event.mouseButton.y >= height * 0.45 &&
                              event.mouseButton.y <= height * 0.50)
                     {
                         m_settings->difficulty = 1; // 0 is easy, 1 is hard
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.55 &&
                              event.mouseButton.y <= height * 0.60)
                     {
                         m_settings->frameRate = 60;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                     else if (event.mouseButton.y >= height * 0.65 &&
                              event.mouseButton.y <= height * 0.70)
                     {
                         m_settings->showFps = false;
+                        playClicked();
+
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.50 &&
@@ -526,6 +553,8 @@ void Menu::settingsScreenInput()
                     {
                         m_settings->frameRate = 120;
                         m_window->setFramerateLimit(m_settings->frameRate);
+                        playClicked();
+
                     }
                 }
                 else if (event.mouseButton.x >= width * 0.10 &&
@@ -534,9 +563,11 @@ void Menu::settingsScreenInput()
                     if (event.mouseButton.y >= height * 0.75 &&
                         event.mouseButton.y <= height * 0.80)
                     {
+                        playClicked();
                         updateSettingsStruct();
                         m_screenName = "title_screen";
                         load();
+
                     }
                 }
             }
@@ -577,12 +608,11 @@ void Menu::loadFileToSaveSlot(int saveSlot)
         filePath = m_settings->saveSlot3;
     }
 
-    filePath = "python getMazeName/openFile.py " + filePath;
+    filePath = "python3 ../src/python/openFile.pyw " + filePath;
     
     system(filePath.c_str());
-    std::fstream file("getMazeName/filename.txt", std::ios::in);
+    std::fstream file("../src/python/filename.txt", std::ios::in);
     getline(file, filePath);
-    file.close();
 
     if (saveSlot == 1)
     {
