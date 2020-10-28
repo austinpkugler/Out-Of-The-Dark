@@ -1,14 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog
 import sys
+import os
 
 root = tk.Tk()
 root.withdraw()
-recommended_filename = ""
-try: # if the c++ system() call had an argument for the script
-    recommended_filename = sys.argv[1].split('/')[-1] # gets file name without path given by c++
-except IndexError:
-    pass
-file_path = filedialog.askopenfilename(defaultextension=".maze", filetypes=(("MAZE file", "*.maze"),), initialfile=recommended_filename)
+recommended_filepath = os.path.abspath("../user_data/levels")
+
+file_path = filedialog.askopenfilename(initialdir=recommended_filepath,
+                                       defaultextension=".maze",
+                                       filetypes=(("MAZE file", "*.maze"),))
 with open("../src/python/filename.txt", 'w') as file:
     file.write(file_path)

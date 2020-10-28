@@ -608,7 +608,7 @@ void Menu::loadFileToSaveSlot(int saveSlot)
         filePath = m_settings->saveSlot3;
     }
 
-    filePath = "python3 ../src/python/openFile.pyw " + filePath;
+    filePath = "python3 ../src/python/openFile.pyw";
     
     system(filePath.c_str());
     std::fstream file("../src/python/filename.txt", std::ios::in);

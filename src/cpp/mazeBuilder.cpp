@@ -435,14 +435,15 @@ void MazeBuilder::generateFile()
 {
     if (m_mazeFileName == "") // if there isnt a fileName, dont have recommended name
     {
-        m_mazeFileName = "python ../python/saveAs.pyw";
+        system("python3 ../src/python/saveAs.pyw");
     }
     else // otherwise do have recommended name
     {
-        m_mazeFileName = "python ../python/saveAs.pyw \"" + m_mazeFileName + "\"";
+        std::string command = "python3 ../src/python/saveAs.pyw ";
+        command += m_mazeFileName;
+        system(command.c_str());
     }
-    system(m_mazeFileName.c_str()); // get filename to save as
-    std::fstream file("../python/filename.txt");
+    std::fstream file("../src/python/filename.txt");
     std::getline(file, m_mazeFileName);
     file.close();
 
@@ -468,9 +469,9 @@ void MazeBuilder::generateFile()
 void MazeBuilder::loadFromFile()
 {
     // opens file using python tkinter
-    system("python ../python/openFile.pyw");
+    system("python3 ../src/python/openFile.pyw");
 
-    std::fstream file("../python/filename.txt", std::ios::in);
+    std::fstream file("../src/python/filename.txt", std::ios::in);
     getline(file, m_mazeFileName);
     file.close();
 
@@ -641,7 +642,7 @@ void MazeBuilder::toPreview()
     }
     else
     {
-        m_squaresToDisplay = delta_y*(gridWidth/gridHeight);
+        m_squaresToDisplay = delta_y*(gridWidth/gridHeight) + 1;
 
     }
     
