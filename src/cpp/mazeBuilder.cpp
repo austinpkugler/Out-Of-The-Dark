@@ -1,5 +1,6 @@
 #include "mazeBuilder.h"
 
+
 /**
  * @brief Constructor for MazeBuilder class.
  * @details Sets member variables to corresponding parameters, and other 
@@ -24,7 +25,6 @@ m_textures(8)
 
     load();
 
-    
     // member variables for grid
     m_MAX_GRID_SIZE = 512;
     m_upperLeftSquare.x = m_MAX_GRID_SIZE/2;
@@ -49,7 +49,7 @@ m_textures(8)
     // scales the background to screen size
     m_backgroundSprite.setScale(m_width / m_backgroundSprite.getLocalBounds().width,
                                 m_height / m_backgroundSprite.getLocalBounds().height);
-    
+
     // rectangle to highlight current texture
     m_textureHighlightRect = sf::RectangleShape(sf::Vector2f(0.16 * m_width, 0.08 * m_height));
     m_textureHighlightRect.setFillColor(sf::Color(230, 230, 220, 150));
@@ -66,6 +66,7 @@ m_textures(8)
 MazeBuilder::~MazeBuilder()
 {
 }
+
 
 /**
  * @brief Manages the loading of all MazeBuilder assets.
@@ -138,6 +139,7 @@ void MazeBuilder::load()
     loadSound(); // function to load sound (inherited from Section)
 }
 
+
 /**
  * @brief Updates the MazeBuilder between input handling and rendering.
  * @details resets the position to the current texture rectangle based off of m_selectedTextureIndex,
@@ -153,6 +155,7 @@ void MazeBuilder::update()
     m_gridLocation.setString("Current position: (" + std::to_string(m_highlightedGridIndex.x)
                              + ", " + std::to_string(m_highlightedGridIndex.y) + ")");
 }
+
 
 /**
  * @brief Polls input and updates screen based off of it.
@@ -289,6 +292,7 @@ void MazeBuilder::handleInput()
     }
 }
 
+
 /**
  * @brief Renders the MazeBuilder screen.
  * @details Renders the background, highlighted texture, highlighted grid square (if there is one), and
@@ -380,6 +384,7 @@ void MazeBuilder::handleMouse(sf::Event& event)
     }
 }
 
+
 /**
  * @brief Handles input specific to the keyboard.
  * @details All keypress based input that occurs in the Maze Builder is handled 
@@ -423,6 +428,7 @@ void MazeBuilder::handleKeyboard(sf::Event& event)
     }
 }
 
+
 /**
  * @brief Saves current maze data to a file.
  * @details Invokes a python script to open file explorer for user to save file. If a filename exists, it 
@@ -458,6 +464,7 @@ void MazeBuilder::generateFile()
     }
 }
 
+
 /**
  * @brief Loads .maze file into maze builder.
  * @details invokes a python script to open file explorer for user to load file. If a filename already exists, it 
@@ -486,6 +493,7 @@ void MazeBuilder::loadFromFile()
     }
 }
 
+
 /**
  * @brief Populates the grid with default textures (wall).
  * @details Loops through the grid and creates a 2d array with proper textures and scales for walls
@@ -511,6 +519,7 @@ void MazeBuilder::populateGrid()
     }
 }
 
+
 /**
  * @brief Draws the 2D grid of tiles.
  * @details Has a 2D nested for loop looping through all squares to display. It then sets the correct position and texture, and 
@@ -534,6 +543,7 @@ void MazeBuilder::drawGrid()
         }
     }
 }
+
 
 /**
  * @brief Checks whether the mouse is currently on a passed tile.
@@ -569,6 +579,7 @@ bool MazeBuilder::isMouseOnBlock(const gridStruct& block) const
 
 }
 
+
 /**
  * @brief Draws the highlighted grid square to the screen.
  * @details First, coordinates of the highlightedGrid square are converted from indexes to pixels.
@@ -587,6 +598,7 @@ void MazeBuilder::highlightGridSquare()
     m_highlightedGridRect.setPosition(pixelX, pixelY);
     m_window->draw(m_highlightedGridRect);
 }
+
 
 /**
  * @brief Resizes the square size and grid to preview most of the maze on one screen (either zooms in or out).
@@ -689,3 +701,4 @@ void MazeBuilder::toMain() // called after state machine is changed to main
     m_highlightedGridRect.setSize(sf::Vector2f(m_squareSize, m_squareSize));
 
 }
+
